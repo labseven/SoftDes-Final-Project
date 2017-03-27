@@ -6,7 +6,7 @@ First iteration physics for hover-craft type vehicle
 
 """
 
-def physics(position, velocity, angle, F_net=[0, 0], T_net=0, dt, mass, moment):
+def physics(position, velocity, angle, dt, mass, moment, F_net=[0, 0], T_net=0,):
     """
         Inputs:
             position->  list object holding x and y: (x, y)
