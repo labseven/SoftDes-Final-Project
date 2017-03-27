@@ -45,8 +45,8 @@ class Sensors:
         direction of angle.
         """
         # Position in map
-        mapX = int(self.car.lidar_world_pos[0])
-        mapY = int(self.car.lidar_world_pos[1])
+        mapX = int(self.car.position[0])
+        mapY = int(self.car.position[1])
 
         ray_angle = angle + self.car.angle
 
