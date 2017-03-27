@@ -43,4 +43,5 @@ class View():
 
 
 if __name__ == "__main__":
-    View()
+    while(True):
+        View()

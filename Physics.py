@@ -81,6 +81,8 @@ class Point(object):
     def __str__(self):
         return 'Point(%d, %d)' % (self.x, self.y)
 
+# TEST BELOW
+
 
 POS = Point(0, 0)
 VEL = Point(0, 0)
