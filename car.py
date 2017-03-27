@@ -12,6 +12,8 @@ class Car:
         self.velocity = [0,0]
         self.mass = mass
         self.moment = moment
+        self.steering = 0
+        self.accelerometer = 0
 
 
     def update_pos(self):
