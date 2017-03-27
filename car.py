@@ -3,9 +3,14 @@ class Car:
     The car. Has sensors, position, can accelerate, and turn the wheels.
     """
 
-    def __init__(self, world, init_pos, init_angle):
+    def __init__(self, world, init_pos, init_angle, lidar_pos, mass = 500, moment = 200):
         self.position = init_pos
         self.angle = init_angle
+        self.lidar_car_pos = lidar_pos
+        self.velocity = [0,0]
+        self.mass = mass
+        self.moment = moment
+
 
     def update_pos(self):
         """
