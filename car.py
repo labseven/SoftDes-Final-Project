@@ -6,7 +6,7 @@ class Car:
     The car. Has sensors, position, can accelerate, and turn the wheels.
     """
 
-    def __init__(self, world, init_pos, init_angle, mass = 500, moment = 200):
+    def __init__(self, init_pos, init_angle, mass = 500, moment = 200):
         self.position = init_pos
         self.angle = init_angle
         self.velocity = [0,0]
