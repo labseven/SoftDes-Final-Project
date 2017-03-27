@@ -1,4 +1,7 @@
-class Car():
+import physics
+
+
+class Car:
     """
     The car. Has sensors, position, can accelerate, and turn the wheels.
     """
@@ -12,9 +15,7 @@ class Car():
 
 
     def update_pos(self):
-        """
-        Updates its position.
-        """
+        [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, angle, F_net=0, T_net=0, dt=delta_time, self.mass, self.moment)
 
         # # Update lidar position
         # self.lidar_pos[0] = self.car.position[0] + cos(angle) * self.car.lidar_pos[0] + sin(angle) * self.car.lidar_pos[1]

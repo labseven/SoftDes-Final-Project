@@ -6,8 +6,11 @@ First iteration physics for hover-craft type vehicle
 
 """
 delta_time = 1
+mass = 500
+moment = 200
 
-def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time, mass, moment):
+
+def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time):
     """
         Inputs:
             position->  Point object holding x and y: (x, y)
@@ -17,7 +20,7 @@ def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time, mass, mo
             F_net   ->  Net Force on car
             T_net   ->  Net Torque on car
             dt      ->  time_step, assumed to be the global variable delta_time
-                            this is for the simulation, if desirable a method
+                            this is for the simulation, if desirable a methoda
                             to find dt can be uncommented.
 
         Outputs:
@@ -77,3 +80,23 @@ class Point(object):
 
     def __str__(self):
         return 'Point(%d, %d)' % (self.x, self.y)
+
+# TEST BELOW
+
+
+POS = Point(0, 0)
+VEL = Point(0, 0)
+ANGLE = Point(60, 1)
+
+for i in range(10):
+    [pos, vel, ang] = physics(POS, VEL, ANGLE, Point(1000, 0))
+    POS = pos
+    VEL = vel
+    ANGLE = ang
+    print(pos.x, pos.y, ':', vel.x, vel.y, ':', ang.x, ang.y)
+for i in range(10):
+    [pos, vel, ang] = physics(POS, VEL, ANGLE, Point(-1000, 0))
+    POS = pos
+    VEL = vel
+    ANGLE = ang
+    print(pos.x, pos.y, ':', vel.x, vel.y, ':', ang.x, ang.y)
