@@ -1,2 +1,2 @@
-# SoftDes-Final-Project
-Genetic Algorythms, ???, 3D print
+# SoftDes Spring 2017 Final Project
+Learning to Drive
