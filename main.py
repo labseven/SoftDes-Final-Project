@@ -1,7 +1,9 @@
-import car
+from car import Car
+from view import View
 import sensors
 import physics
-import world
+from world import World
+import pygame
 
 
 class Scene():
@@ -12,7 +14,7 @@ class Scene():
         self.window_size = window_size
         self.world = World(window_size)
         pygame.init()
-        self.canvas = pygame.display.set_mode(self.window_size, 0, 32)
+        self.view = View(world=self.world)
 
 
 def main():
@@ -21,7 +23,8 @@ def main():
     clock = pygame.time.Clock()
 
     while True:
-        scene.render_scene()
+        scene.view.draw_scene(scene.world)
+
         clock.tick(60)
 
 if __name__ == '__main__':

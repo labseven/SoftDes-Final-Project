@@ -6,7 +6,7 @@ class Car:
     The car. Has sensors, position, can accelerate, and turn the wheels.
     """
 
-    def __init__(self, world, init_pos, init_angle, mass = 500, moment = 200):
+    def __init__(self, init_pos, init_angle, mass = 500, moment = 200):
         self.position = init_pos
         self.angle = init_angle
         self.velocity = [0,0]
@@ -17,7 +17,7 @@ class Car:
 
 
     def update_pos(self):
-        [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, angle, F_net=0, T_net=0, dt=delta_time, self.mass, self.moment)
+        [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, self.angle, self.mass, self.moment, F_net=0, T_net=0, dt=delta_time)
 
         # # Update lidar position
         # self.lidar_pos[0] = self.car.position[0] + cos(angle) * self.car.lidar_pos[0] + sin(angle) * self.car.lidar_pos[1]

@@ -7,7 +7,7 @@ First iteration physics for hover-craft type vehicle
 """
 delta_time = 1
 
-def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time, mass, moment):
+def physics(position, velocity, angle, mass, moment, F_net=0, T_net=0, dt=delta_time):
     """
         Inputs:
             position->  Point object holding x and y: (x, y)
