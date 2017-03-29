@@ -1,24 +1,26 @@
 import pygame
 import numpy as np
 from math import sin, cos
+from car import *
 
 
 class View():
-    def __init__(self, world=None):
+    def __init__(self, map=None):
         self.bg_color = (70, 204, 63)
         self.road_color = (0, 0, 0)
-        self.world = world
+        # self.objects = []
         self.screen = pygame.display.set_mode((1000,1000))
 
     def draw_scene(self, world):
         """
         Draws one frame of a scene.
         """
-        self.screen.fill(self.bg_color)
-        self.render_road(self.world.road)
-        self.draw_car(self.world.car)
-        # self.draw_objects(self.objects)
-        pygame.display.flip()
+        while True:
+            self.screen.fill(self.bg_color)
+            self.render_road(world.road)
+            self.draw_car(world.car)
+            # self.draw_objects(self.objects)
+            pygame.display.flip()
 
     def render_road(self, road):
         """

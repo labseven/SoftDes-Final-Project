@@ -6,7 +6,7 @@ Accelerometer
 Spedometer
 """
 
-from math import sin, cos
+from math import sin, cos, sqrt
 
 class Sensors:
     """
@@ -44,11 +44,35 @@ class Sensors:
         Returns the distancs from lidar position to nearest wall, in the
         direction of angle.
         """
+
+        locationX = self.car.position[0]
+        locationY = self.car.position[1]
         # Position in map
-        mapX = int(self.car.position[0])
-        mapY = int(self.car.position[1])
+        mapX = int(locationX)
+        mapY = int(locationY)
 
         ray_angle = angle + self.car.angle
+        dirX = sin(ray_angle)
+        dirY = cos(ray_angle)
+
+        deltaDistX = sqrt(1 + dirY**2 / dirX**2)
+        deltaDistY = sqrt(1 + dirX**2 / dirY**2)
+
+        if (dirX < 0):
+            stepX = -1
+            sideDistX = (locationX - mapX) * deltaDistX
+        else:
+            stepX = 1
+            sideDistX = (mapX - locationX + 1) * deltaDistX
+
+        if (dirY < 0):
+            stepY = -1
+            sideDistY = (locationY - mapY) * deltaDistY
+        else:
+            stepY = 1
+            sideDistY = (mapY - locationY + 1) * deltaDistY
+
+        print("Step:", stepX,stepY, "sideDist", sideDistX,sideDistY)
 
 
         # Step through boxes until you hit a wall
@@ -64,4 +88,9 @@ class Sensors:
             if self.car.world.world_map[mapX][mapY] == 1:
                 break
 
+        print("Hit at:", mapX, mapY)
         return 1
+
+
+if __name__ == '__main__':
+    pass

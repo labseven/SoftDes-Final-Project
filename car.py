@@ -14,10 +14,14 @@ class Car:
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
+        self.size = (100,100)
+        self.color = (124,124,124)
 
 
     def update_pos(self):
-        [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, self.angle, self.mass, self.moment, F_net=0, T_net=0, dt=delta_time)
+        # F_net and T_net are inputs from keyboard or autonomous
+        delta_time = .1
+        [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
 
         # # Update lidar position
         # self.lidar_pos[0] = self.car.position[0] + cos(angle) * self.car.lidar_pos[0] + sin(angle) * self.car.lidar_pos[1]
