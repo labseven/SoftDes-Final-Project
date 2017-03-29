@@ -5,7 +5,6 @@ import world
 from view import *
 
 
-
 def main():
     view = View()
 
