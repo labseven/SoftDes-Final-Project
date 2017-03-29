@@ -18,6 +18,7 @@ class Car:
 
     def update_pos(self):
         # F_net and T_net are inputs from keyboard or autonomous
+        delta_time = .1
         [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
 
         # # Update lidar position

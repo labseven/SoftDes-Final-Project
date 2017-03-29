@@ -7,7 +7,6 @@ from math import sin, cos
 class View():
     def __init__(self, map=None):
         self.road = misc.imread('track.png', mode='L')
-        print(self.map)
         self.bg_color = (70, 204, 63)
         self.road_color = (0, 0, 0)
         # self.car = Car()

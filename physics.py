@@ -44,7 +44,7 @@ def physics(position, velocity, angle, dt, mass, moment, F_net=[0, 0], T_net=0,)
     return [position, velocity, angle]
 
 
-def integrate(F_net, mass, pos, vel, dt=delta_time):
+def integrate(F_net, mass, pos, vel, dt):
     """
         Function to do all of the heavy lifting for the physics function.
         Calculates both the rotational and linear motions.
