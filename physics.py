@@ -33,14 +33,18 @@ def physics(position, velocity, angle, dt, mass, moment, F_net=[0, 0], T_net=0,)
     vx = velocity[0]
     vy = velocity[1]
 
-    theta = angle[0]
-    omega = angle[1]
+    # Car needs new omega variable
+    # theta = angle[0]
+    # omega = angle[1]
+    theta = angle
+    omega = 0
     [x, vx] = integrate(F_x, mass, x, vx, dt)
     [y, vy] = integrate(F_y, mass, y, vy, dt)
     [theta, omega] = integrate(T_net, moment, theta, omega, dt)
     position = [x, y]
     velocity = [vx, vy]
-    angle = [theta, omega]
+    # angle = [theta, omega]
+    angle = angle
     return [position, velocity, angle]
 
 

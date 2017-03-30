@@ -6,24 +6,24 @@ from car import *
 
 
 class View():
-    def __init__(self, map=None):
+    def __init__(self, size=(1000,1000), map=None):
         self.road = misc.imread('track.png', mode='L')
         self.bg_color = (70, 204, 63)
         self.road_color = (0, 0, 0)
-        self.car = Car((10,10), 0)
+        self.car = Car((500.1,500.75), 0)
         # self.objects = []
-        self.screen = pygame.display.set_mode((1000,1000))
+        self.screen = pygame.display.set_mode(size)
 
     def draw_scene(self):
         """
         Draws one frame of a scene.
         """
-        while True:
-            self.screen.fill(self.bg_color)
-            self.render_road(self.road)
-            self.draw_car(self.car)
-            # self.draw_objects(self.objects)
-            pygame.display.flip()
+
+        self.screen.fill(self.bg_color)
+        self.render_road(self.road)
+        self.draw_car(self.car)
+        # self.draw_objects(self.objects)
+        pygame.display.flip()
 
     def render_road(self, road):
         """
@@ -43,7 +43,7 @@ class View():
         w, l = car.size
         vertices = [(x-cos(theta)*w, y+sin(theta)*l), (x+cos(theta)*w, y+sin(theta)*l),
                     (x-cos(theta)*w, y-sin(theta)*l), (x+cos(theta)*w, y-sin(theta)*l)]
-        print(vertices)
+        # print(vertices)
         pygame.draw.polygon(self.screen, car.color, vertices)
 
 

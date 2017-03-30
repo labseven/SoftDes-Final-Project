@@ -7,8 +7,9 @@ Spedometer
 """
 
 from math import sin, cos, sqrt
+import numpy as np
 
-class Sensors:
+class Sensors():
     """
     All sensor things.
 
@@ -28,6 +29,16 @@ class Sensors:
             self.lidar_angels.append(-lidar_max_angle + (i * lidar_spacing))
 
 
+        # Hardcoded world map until we refactor
+        size = (1000,1000)
+        self.world_map = np.zeros(size)
+        self.world_map_size = size
+        # Quick wall for testing
+        for i in range(size[0]):
+            self.world_map[i][i] = 1
+        print(self.world_map)
+
+
     def get_lidar_data(self):
         """
         Outputs a list of distances.
@@ -39,7 +50,7 @@ class Sensors:
         return distances
 
 
-    def get_lidar_distance(angle):
+    def get_lidar_distance(self, angle):
         """
         Returns the distancs from lidar position to nearest wall, in the
         direction of angle.
@@ -51,10 +62,14 @@ class Sensors:
         mapX = int(locationX)
         mapY = int(locationY)
 
+        print(self.car.angle)
         ray_angle = angle + self.car.angle
         dirX = sin(ray_angle)
         dirY = cos(ray_angle)
 
+        if dirX == 0:
+            deltaDistX = 0
+        else:
         deltaDistX = sqrt(1 + dirY**2 / dirX**2)
         deltaDistY = sqrt(1 + dirX**2 / dirY**2)
 
@@ -72,11 +87,12 @@ class Sensors:
             stepY = 1
             sideDistY = (mapY - locationY + 1) * deltaDistY
 
-        print("Step:", stepX,stepY, "sideDist", sideDistX,sideDistY)
+        print("Step:", stepX,stepY, "sideDist", sideDistX, sideDistY)
 
 
         # Step through boxes until you hit a wall
         while(True):
+            # Step in the shorter side dist
             if sideDistX < sideDistY:
                 sideDistX += deltaDistX
                 mapX += stepX
@@ -85,11 +101,19 @@ class Sensors:
                 sideDistY += deltaDistY
                 mapY += stepY
                 side = 1
-            if self.car.world.world_map[mapX][mapY] == 1:
+            # Hit edge of map
+            if mapX >= self.world_map_size[0]-1 or mapY >= self.world_map_size[1]-1:
+                break
+            # if self.car.world.world_map[mapX][mapY] == 1:
+            if self.world_map[mapX][mapY] == 1:
                 break
 
         print("Hit at:", mapX, mapY)
-        return 1
+        print("sideDist:", sideDistX, sideDistY)
+
+        distance = sqrt((mapX-locationX)**2 + (mapY-locationY)**2)
+
+        return distance
 
 
 if __name__ == '__main__':
