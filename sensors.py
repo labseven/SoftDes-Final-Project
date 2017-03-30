@@ -4,7 +4,7 @@
 The sensor class
 """
 
-from math import sin, cos, sqrt
+from math import sin, cos, sqrt, pi
 import numpy as np
 
 class Sensors():
@@ -12,20 +12,21 @@ class Sensors():
     Sensor implemented:
     Lidar with n points
     """
-    def __init__(self, car, world_map, lidar_num = 9, lidar_max_angle = 90):
+    def __init__(self, car, road, world_size, lidar_num = 20, lidar_max_angle = pi-.01):
         """
         Initializes the sensor class.
         """
 
         self.car = car
-        self.world_map = world_map
+        self.road = road
+        self.world_size = world_size
 
-        self.lidar_angels = []
-
+        self.lidar_angles = []
         # Add equally spaced sensors
-        lidar_spacing = lidar_num / (2 * lidar_max_angle)
+        lidar_spacing = (2 * lidar_max_angle) / (lidar_num)
+
         for i in range(lidar_num):
-            self.lidar_angels.append(-lidar_max_angle + (i * lidar_spacing))
+            self.lidar_angles.append(-lidar_max_angle + (i * lidar_spacing))
 
 
     def get_lidar_data(self):
@@ -33,10 +34,13 @@ class Sensors():
         Outputs a list of distances.
         """
         distances = []
-        for angle in self.lidar_angels:
-            distances.append(get_lidar_distance(angle))
+        hit_pos = []
+        for angle in self.lidar_angles:
+            lidar = self.get_lidar_distance(angle)
+            distances.append(lidar[0])
+            hit_pos.append(lidar[1])
 
-        return distances
+        return distances, hit_pos
 
 
     def get_lidar_distance(self, angle):
@@ -51,8 +55,12 @@ class Sensors():
         mapX = int(locationX)
         mapY = int(locationY)
 
-        print(self.car.angle[0])
-        ray_angle = angle + self.car.angle[0]
+        # What the value of the map where the car is at
+        curr_map_value = self.road[mapX][mapY]
+
+        # print(self.car.angle[0])
+        ray_angle = angle - self.car.angle[0]
+
         dirX = sin(ray_angle)
         dirY = cos(ray_angle)
 
@@ -95,18 +103,18 @@ class Sensors():
                 mapY += stepY
                 side = 1
             # Hit edge of map
-            if mapX <= 0 or mapX >= self.world_map.world_map_size[0]-1 or mapY <= 0 or mapY >= self.world_map.world_map_size[1]-1:
+            if mapX <= 0 or mapX >= self.world_size[0]-1 or mapY <= 0 or mapY >= self.world_size[1]-1:
                 break
             # if self.car.world.world_map[mapX][mapY] == 1:
-            if self.world_map.world_map[mapX][mapY] == 1:
+            if self.road[mapX][mapY] != curr_map_value:
                 break
 
-        print("Hit at:", mapX, mapY)
+        # print("Hit at:", mapX, mapY)
         # print("sideDist:", sideDistX, sideDistY)
 
         distance = sqrt((mapX-locationX)**2 + (mapY-locationY)**2)
 
-        return distance
+        return distance, [mapX, mapY]
 
 
 if __name__ == '__main__':

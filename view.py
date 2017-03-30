@@ -46,6 +46,15 @@ class View():
         pygame.draw.polygon(self.screen, car.color, vertices)  # Draw car
         pygame.draw.polygon(self.screen, (0, 0, 0), vertices, 2)  # Draw outline
 
+        self.draw_lidar(car)
+
+    def draw_lidar(self, car):
+        """
+        Draws lidar beams.
+        """
+
+        for hit in car.lidar_hits:
+            pygame.draw.line(self.screen, (250,0,0), car.position, hit)
 
 
 if __name__ == "__main__":
