@@ -3,7 +3,7 @@ World:
 Holds the map.
 """
 from car import Car
-import scipy.misc as misc
+import scipy.ndimage as misc
 from random import randint
 
 
