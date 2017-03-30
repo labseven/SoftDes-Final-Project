@@ -1,4 +1,4 @@
-import physics
+from physics import physics
 
 
 class Car:
@@ -14,14 +14,14 @@ class Car:
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
-        self.size = (mass/50,mass/25)
+        self.size = (mass/50, mass/25)
         self.color = car_color
 
 
     def update_pos(self):
         # F_net and T_net are inputs from keyboard or autonomous
         delta_time = .1
-        [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
+        [self.position, self.velocity, self.angle] = physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
 
         # # Update lidar position
         # self.lidar_pos[0] = self.car.position[0] + cos(angle) * self.car.lidar_pos[0] + sin(angle) * self.car.lidar_pos[1]
