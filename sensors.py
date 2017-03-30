@@ -12,28 +12,20 @@ class Sensors():
     Sensor implemented:
     Lidar with n points
     """
-    def __init__(self, car, lidar_num = 9, lidar_max_angle = 90):
+    def __init__(self, car, world_map, lidar_num = 9, lidar_max_angle = 90):
         """
         Initializes the sensor class.
         """
 
         self.car = car
+        self.world_map = world_map
+
         self.lidar_angels = []
 
         # Add equally spaced sensors
         lidar_spacing = lidar_num / (2 * lidar_max_angle)
         for i in range(lidar_num):
             self.lidar_angels.append(-lidar_max_angle + (i * lidar_spacing))
-
-
-        # Hardcoded world map until we refactor
-        size = (1000,1000)
-        self.world_map = np.zeros(size)
-        self.world_map_size = size
-        # Quick wall for testing
-        for i in range(size[0]):
-            self.world_map[i][i] = 1
-        print("Made sensor world_map")
 
 
     def get_lidar_data(self):
@@ -103,10 +95,10 @@ class Sensors():
                 mapY += stepY
                 side = 1
             # Hit edge of map
-            if mapX <= 0 or mapX >= self.world_map_size[0]-1 or mapY <= 0 or mapY >= self.world_map_size[1]-1:
+            if mapX <= 0 or mapX >= self.world_map.world_map_size[0]-1 or mapY <= 0 or mapY >= self.world_map.world_map_size[1]-1:
                 break
             # if self.car.world.world_map[mapX][mapY] == 1:
-            if self.world_map[mapX][mapY] == 1:
+            if self.world_map.world_map[mapX][mapY] == 1:
                 break
 
         print("Hit at:", mapX, mapY)
