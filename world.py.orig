@@ -5,7 +5,6 @@ Holds the map.
 from car import Car
 import scipy.misc as misc
 from random import randint
-import numpy as np
 
 
 class World():
@@ -14,4 +13,11 @@ class World():
         Initializes the numpy matrix for the road and creates a car.
         """
         self.road = misc.imread('track.png', mode='L')
-        self.car = Car([500, 500], [0, 1], [0.1, 0], car_color=(randint(0, 255), randint(0, 255), randint(0, 255)))
+        self.car = Car([500, 500], [0, 1], [0, 0], car_color=(randint(0, 255), randint(0, 255), randint(0, 255)))
+
+
+        self.world_map = np.zeros(size)
+        # Quick wall for testing
+        for i in range(size[0]):
+            self.world_map[i][0] = 1
+        print(self.world_map)

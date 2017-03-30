@@ -15,9 +15,14 @@ class Car():
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
+<<<<<<< HEAD
+        self.size = (100, 100)
+        self.color = (124, 124, 124)
+        self.sensors = Sensors(self)
+=======
         self.size = (mass/50,mass/25)
         self.color = car_color
-        self.sensors = Sensors(self)
+>>>>>>> e46ce126ac3ac85d0977ed5b0ec2825fe48df938
 
 
     def update_pos(self):
@@ -25,4 +30,7 @@ class Car():
         F_net = [10,0]
         delta_time = .1
         [self.position, self.velocity, self.angle] = physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
-        # print("Car pos:", self.position)
+        print("Car pos:", self.position)
+        # # Update lidar position
+        # self.lidar_pos[0] = self.car.position[0] + cos(angle) * self.car.lidar_pos[0] + sin(angle) * self.car.lidar_pos[1]
+        # self.lidar_pos[1] = self.car.position[1] + sin(angle) * self.car.lidar_pos[0] + cos(angle) * self.car.lidar_pos[1]

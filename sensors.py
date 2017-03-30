@@ -36,7 +36,7 @@ class Sensors():
         # Quick wall for testing
         for i in range(size[0]):
             self.world_map[i][i] = 1
-        print(self.world_map)
+        print("Made sensor world_map")
 
 
     def get_lidar_data(self):
@@ -62,16 +62,16 @@ class Sensors():
         mapX = int(locationX)
         mapY = int(locationY)
 
-        print(self.car.angle)
-        ray_angle = angle + self.car.angle
+        print(self.car.angle[0])
+        ray_angle = angle + self.car.angle[0]
         dirX = sin(ray_angle)
         dirY = cos(ray_angle)
 
         if dirX == 0:
             deltaDistX = 0
         else:
-        deltaDistX = sqrt(1 + dirY**2 / dirX**2)
-        deltaDistY = sqrt(1 + dirX**2 / dirY**2)
+            deltaDistX = sqrt(1 + dirY**2 / dirX**2)
+            deltaDistY = sqrt(1 + dirX**2 / dirY**2)
 
         if (dirX < 0):
             stepX = -1

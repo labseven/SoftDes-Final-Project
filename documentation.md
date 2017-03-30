@@ -11,6 +11,7 @@ Car Origin: Center
 - position - current world position
 - orientation - current world orientation
 - world - the world the car is in
+- angle - list with angle and angular velocity
 
 
 ## Sensors:
