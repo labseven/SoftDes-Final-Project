@@ -5,8 +5,9 @@ from math import sin, cos
 
 
 def main():
-    view = View()
-    world = World((1000, 1000))
+    size = (1000,1000)
+    view = View(size=size)
+    world = World(size)
 
     clock = pygame.time.Clock()
     event_keys = (pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a)
@@ -28,6 +29,8 @@ def main():
 
         view.draw_scene(world)
         world.car.update_pos()
+        print(world.car.sensors.get_lidar_distance(0))
+
         clock.tick(60)
 
 

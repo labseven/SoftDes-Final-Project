@@ -10,9 +10,9 @@ from math import sin, cos
 
 
 class View():
-    def __init__(self, map=None):
+    def __init__(self, size=(1000,1000), map=None):
         self.bg_color = (70, 204, 63)
-        self.screen = pygame.display.set_mode((1000, 1000))
+        self.screen = pygame.display.set_mode(size)
 
     def draw_scene(self, world):
         """
@@ -38,13 +38,14 @@ class View():
         x, y = car.position
         theta = car.angle[0]
         w, l = car.size
-        # Now draws car vertices correctly
+
         vertices = [(x-l*sin(theta)-w*cos(theta), y+cos(theta)*l-w*sin(theta)),
                     (x-(l*sin(theta))+(w*cos(theta)), y+(cos(theta)*l)+(w*sin(theta))),
                     (x+sin(theta)*l+cos(theta)*w, y-cos(theta)*l+sin(theta)*w),
                     (x+sin(theta)*l-cos(theta)*w, y-cos(theta)*l-sin(theta)*w)]
         pygame.draw.polygon(self.screen, car.color, vertices)  # Draw car
         pygame.draw.polygon(self.screen, (0, 0, 0), vertices, 2)  # Draw outline
+
 
 
 if __name__ == "__main__":
