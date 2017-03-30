@@ -1,13 +1,15 @@
-# Map coordinate system:
-Origin:
+# Coordinate systems:
+Map Origin: Top left
+Map direction: right, down
+
+Car Origin: Center
+
 
 # Class variables:
 
 ## Car:
 - position - current world position
 - orientation - current world orientation
-- lidar_car_pos - position of lidar relative to origin of car (when pointing north)
-- lidar_world_pos - position of the lidar in the world
 - world - the world the car is in
 
 
@@ -18,3 +20,8 @@ Origin:
 ## World:
 - world_map - 2D array holding the map
 - materials = [[R, G, B], "name"] - list of materials of the map - will be expanded to hold traction or other relevant data
+
+## Map
+0 - Empty
+1 - Road
+2 - Wall

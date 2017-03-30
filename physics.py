@@ -5,14 +5,13 @@
 First iteration physics for hover-craft type vehicle
 
 """
-delta_time = 1
 
-def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time, mass, moment):
+def physics(position, velocity, angle, dt, mass, moment, F_net=[0, 0], T_net=0,):
     """
         Inputs:
-            position->  Point object holding x and y: (x, y)
-            velocity->  Point object holding vx and vy: (vx, vy)
-            angle   ->  Point object holding theta and omega
+            position->  list object holding x and y: (x, y)
+            velocity->  list object holding vx and vy: (vx, vy)
+            angle   ->  list object holding theta and omega
                             (theta, omega)
             F_net   ->  Net Force on car
             T_net   ->  Net Torque on car
@@ -21,31 +20,31 @@ def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time, mass, mo
                             to find dt can be uncommented.
 
         Outputs:
-            position->  Point object holding updated x and y: (x, y)
-            velocity->  Point object holding updated vx and vy: (vx, vy)
-            angle   ->  Point object holding updated theta and omega
+            position->  list object holding updated x and y: (x, y)
+            velocity->  list object holding updated vx and vy: (vx, vy)
+            angle   ->  list object holding updated theta and omega
     """
-    F_x = F_net.x
-    F_y = F_net.y
+    F_x = F_net[0]
+    F_y = F_net[1]
 
-    x = position.x
-    y = position.y
+    x = position[0]
+    y = position[1]
 
-    vx = velocity.x
-    vy = velocity.y
+    vx = velocity[0]
+    vy = velocity[1]
 
-    theta = angle.x
-    omega = angle.y
+    theta = angle[0]
+    omega = angle[1]
     [x, vx] = integrate(F_x, mass, x, vx, dt)
     [y, vy] = integrate(F_y, mass, y, vy, dt)
     [theta, omega] = integrate(T_net, moment, theta, omega, dt)
-    position = Point(x, y)
-    velocity = Point(vx, vy)
-    angle = Point(theta, omega)
+    position = [x, y]
+    velocity = [vx, vy]
+    angle = [theta, omega]
     return [position, velocity, angle]
 
 
-def integrate(F_net, mass, pos, vel, dt=delta_time):
+def integrate(F_net, mass, pos, vel, dt):
     """
         Function to do all of the heavy lifting for the physics function.
         Calculates both the rotational and linear motions.
@@ -68,12 +67,3 @@ def integrate(F_net, mass, pos, vel, dt=delta_time):
     vel = acc * dt + vel
     pos = .5 * acc * dt**2 + vel_old*dt + pos
     return [pos, vel]
-
-
-class Point(object):
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return 'Point(%d, %d)' % (self.x, self.y)
