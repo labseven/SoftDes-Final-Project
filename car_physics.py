@@ -7,9 +7,23 @@ Second iteration physics for bicycle-type vehicle
 """
 
 
-def calculate_nets(position, velocity, angle, mass, moment):
-    pass
+def calculate_nets(P, V, alpha, beta, theta, mass, moment):
+    """
+        alpha -> input from steering
+        beta -> angle between velocity and car
+        theta -> angle of car in relation to the map
+        V -> vector of velocities (x, y) respectively
+        P -> vector of positions(x, y) respectively
+        tractive force -> input from keys (accelerating or gas)
+    """
+    speed = (V[0]**2 + V[1]**2)**-.5
+    beta = atan(V[0] / V[1])
+    slip_angle = alpha - beta
 
+    F_drag = -C_drag * speed
+    F_rolling = -C_rolling * speed
+    F_long_wheels = -sin(alpha) * C_cornering * slip_angle
+    F_lat_wheels = cos(alpha) * C_cornering * slip_angle + C_cornering * beta
 
 def update(position, velocity, angle, dt, mass, moment):
     """
