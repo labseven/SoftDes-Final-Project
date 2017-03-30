@@ -1,9 +1,7 @@
 """
-Current Sensors:
+@Author: Adam Novotny
 
-Lidar with n points
-Accelerometer
-Spedometer
+The sensor class
 """
 
 from math import sin, cos, sqrt
@@ -11,9 +9,8 @@ import numpy as np
 
 class Sensors():
     """
-    All sensor things.
-
-    Has a world and car attached to it.
+    Sensor implemented:
+    Lidar with n points
     """
     def __init__(self, car, lidar_num = 9, lidar_max_angle = 90):
         """
@@ -68,9 +65,13 @@ class Sensors():
         dirY = cos(ray_angle)
 
         if dirX == 0:
-            deltaDistX = 0
+            deltaDistX = 0 # Might be wrong
         else:
             deltaDistX = sqrt(1 + dirY**2 / dirX**2)
+
+        if dirY == 0:
+            deltaDistY = 0 # Might be wrong
+        else:
             deltaDistY = sqrt(1 + dirX**2 / dirY**2)
 
         if (dirX < 0):
@@ -87,7 +88,7 @@ class Sensors():
             stepY = 1
             sideDistY = (mapY - locationY + 1) * deltaDistY
 
-        print("Step:", stepX,stepY, "sideDist", sideDistX, sideDistY)
+        # print("Step:", stepX,stepY, "sideDist", sideDistX, sideDistY)
 
 
         # Step through boxes until you hit a wall
@@ -102,14 +103,14 @@ class Sensors():
                 mapY += stepY
                 side = 1
             # Hit edge of map
-            if mapX >= self.world_map_size[0]-1 or mapY >= self.world_map_size[1]-1:
+            if mapX <= 0 or mapX >= self.world_map_size[0]-1 or mapY <= 0 or mapY >= self.world_map_size[1]-1:
                 break
             # if self.car.world.world_map[mapX][mapY] == 1:
             if self.world_map[mapX][mapY] == 1:
                 break
 
         print("Hit at:", mapX, mapY)
-        print("sideDist:", sideDistX, sideDistY)
+        # print("sideDist:", sideDistX, sideDistY)
 
         distance = sqrt((mapX-locationX)**2 + (mapY-locationY)**2)
 

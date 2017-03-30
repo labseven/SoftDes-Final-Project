@@ -29,6 +29,7 @@ def main():
 
         view.draw_scene(world)
         world.car.update_pos()
+        print(world.car.sensors.get_lidar_distance(0))
 
         clock.tick(60)
 
