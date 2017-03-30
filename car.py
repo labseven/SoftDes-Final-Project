@@ -1,5 +1,5 @@
-from physics import *
-from sensors import *
+from sensors import sensors
+from physics import physics
 
 
 class Car():
@@ -15,7 +15,7 @@ class Car():
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
-        self.size = (mass/50,mass/25)
+        self.size = (mass/50, mass/25)
         self.color = car_color
         self.sensors = Sensors(self, world_map)
 
@@ -25,4 +25,3 @@ class Car():
         F_net = [10,0]
         delta_time = .1
         [self.position, self.velocity, self.angle] = physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
-        # print("Car pos:", self.position)
