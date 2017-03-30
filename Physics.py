@@ -20,7 +20,7 @@ def physics(position, velocity, angle, F_net=0, T_net=0, dt=delta_time):
             F_net   ->  Net Force on car
             T_net   ->  Net Torque on car
             dt      ->  time_step, assumed to be the global variable delta_time
-                            this is for the simulation, if desirable a methoda
+                            this is for the simulation, if desirable a method
                             to find dt can be uncommented.
 
         Outputs:
@@ -80,8 +80,6 @@ class Point(object):
 
     def __str__(self):
         return 'Point(%d, %d)' % (self.x, self.y)
-
-# TEST BELOW
 
 
 POS = Point(0, 0)
