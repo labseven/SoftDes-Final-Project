@@ -1,4 +1,4 @@
-import physics
+# import physics
 import car_physics
 
 
@@ -21,8 +21,13 @@ class Car:
 
     def update_pos(self):
         # F_net and T_net are inputs from keyboard or autonomous
-        delta_time = .1
-        # [self.position, self.velocity, self.angle] = physics.physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
+        delta_time = .09
+        """[self.position,
+         self.velocity,
+         self.angle] = physics.physics(self.position,
+                                       self.velocity,
+                                       self.angle, delta_time,
+                                       self.mass, self.moment)"""
         [self.position,
          self.velocity,
          self.angle] = car_physics.update_physics(self.position,

@@ -36,7 +36,7 @@ class View():
         Draws the car onto the frame.
         """
         x, y = car.position
-        theta = car.angle[0]
+        theta = -car.angle[0]
         w, l = car.size
         # Now draws car vertices correctly
         vertices = [(x-l*sin(theta)-w*cos(theta), y+cos(theta)*l-w*sin(theta)),

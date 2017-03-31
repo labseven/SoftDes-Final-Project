@@ -23,12 +23,16 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
 
         beta -> angle between velocity and car in RADIANS
     """
+    L = 3  # Wheelbase in meters
+
+    a = 1/3
+    b = 1 - a
+    a = a*L
+    b = b*L
     # Initialize all constant values: some are magic numbers
     max_slip_angle = math.radians(6)
     # C_cornering = (mass * 9.81) / (2 * max_slip_angle)
-    C_cornering = 5
-    print(C_cornering)
-    L = 3  # Wheelbase in meters
+    C_cornering = 2000
     C_drag = 0.4257
     C_rolling = 30 * C_drag
     speed = (velocity[0]**2 + velocity[1]**2)**.5
@@ -39,27 +43,44 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
         direction = direction / abs(direction)
 
     theta = angle[0]
+    omega = angle[1]
     if velocity[1] == 0:
-        beta = 0
-        slip_angle = 0
+        if velocity[0] == 0:
+            beta = 0
+        elif velocity[0] > 0:
+            beta = math.pi/2
+        else:
+            beta = -math.pi/2
     else:
-        beta = math.atan(velocity[0] / velocity[1]) - theta
-        slip_angle = steering - beta
+        beta = math.atan(velocity[0] / velocity[1])
 
-    if slip_angle > max_slip_angle:
-        slip_angle = max_slip_angle
-    elif slip_angle < -max_slip_angle:
-        slip_angle = -max_slip_angle
+    angle_sep = theta - beta
+    v_lat = math.sin(angle_sep) * speed
+    v_long = math.cos(angle_sep) * speed
+    print(v_lat, ":", v_long, "||", velocity[0], velocity[1])
+    if speed < 1:
+        angle[1] = 0
+        slip_angle_f = 0
+        slip_angle_r = 0
+    else:
+        slip_angle_f = steering - ((a * omega + v_lat)/v_long)
+        slip_angle_r = ((b * omega + v_lat)/v_long)
 
-    if beta > max_slip_angle:
-        beta = max_slip_angle
-    elif beta < -max_slip_angle:
-        beta = -max_slip_angle
+        if slip_angle_f > max_slip_angle:
+            slip_angle_f = max_slip_angle
+        elif slip_angle_f < -max_slip_angle:
+            slip_angle_f = -max_slip_angle
+
+        if slip_angle_r > max_slip_angle:
+            slip_angle_r = max_slip_angle
+        elif slip_angle_r < -max_slip_angle:
+            slip_angle_r = -max_slip_angle
 
     F_drag = -C_drag * speed * direction
     F_rolling = -C_rolling * speed * direction
-    F_l_front = C_cornering * slip_angle
-    F_l_rear = C_cornering * beta
+
+    F_l_front = C_cornering * slip_angle_f
+    F_l_rear = C_cornering * slip_angle_r
 
     F_long_wheels = -1 * math.sin(steering) * F_l_front
     F_lat_wheels = math.cos(steering) * F_l_front + F_l_rear
@@ -70,8 +91,9 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     F_x = math.sin(theta) * F_long + math.cos(theta) * F_lat
     F_y = math.cos(theta) * F_long - math.sin(theta) * F_lat
 
-    print(F_l_front, ':', F_l_rear)
-    Net_Torque = F_l_front * L/2 - F_l_rear * L/2
+    Net_Torque = F_l_front * a - F_l_rear * b
+    # print(F_l_front, ':', F_l_rear, "=", Net_Torque)
+
     return calc_change(position, velocity, angle, dt, mass, moment, [F_x, F_y],
                        Net_Torque)
 
