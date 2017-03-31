@@ -5,27 +5,66 @@
 Second iteration physics for bicycle-type vehicle
 
 """
+import math
 
 
-def calculate_nets(P, V, alpha, beta, theta, mass, moment):
+def update_physics(position, velocity, angle, steering, F_traction, mass,
+                   moment, dt):
     """
-        alpha -> input from steering
-        beta -> angle between velocity and car
-        theta -> angle of car in relation to the map
-        V -> vector of velocities (x, y) respectively
-        P -> vector of positions(x, y) respectively
-        tractive force -> input from keys (accelerating or gas)
+        position -> vector of positions(x, y) respectively
+        velocity -> vector of velocities (x, y) respectively
+        angle   ->  list object holding theta and omega
+                        (theta, omega)
+        steering -> input from steering
+        F_traction -> Tractive force input from keys (accelerating or brakes)
+        mass
+        moment
+        dt
+
+        beta -> angle between velocity and car in RADIANS
     """
-    speed = (V[0]**2 + V[1]**2)**-.5
-    beta = atan(V[0] / V[1])
-    slip_angle = alpha - beta
+    # Initialize all constant values: some are magic numbers
+    max_slip_angle = math.radians(6)
+    C_cornering = (mass * 9.81) / (2 * max_slip_angle)
+    L = 3  # Wheelbase in meters
+    C_drag = 0.4257
+    C_rolling = 30 * C_drag
+    speed = (velocity[0]**2 + velocity[1]**2)**-.5
+
+    theta = angle[0]
+    beta = math.atan(velocity[0] / velocity[1]) - theta
+    slip_angle = steering - beta
+
+    if slip_angle > max_slip_angle:
+        slip_angle = max_slip_angle
+    elif slip_angle < -max_slip_angle:
+        slip_angle = -max_slip_angle
+
+    if beta > max_slip_angle:
+        beta = max_slip_angle
+    elif beta < -max_slip_angle:
+        beta = -max_slip_angle
 
     F_drag = -C_drag * speed
     F_rolling = -C_rolling * speed
-    F_long_wheels = -sin(alpha) * C_cornering * slip_angle
-    F_lat_wheels = cos(alpha) * C_cornering * slip_angle + C_cornering * beta
+    F_l_front = C_cornering * slip_angle
+    F_l_rear = C_cornering * beta
 
-def update(position, velocity, angle, dt, mass, moment):
+    F_long_wheels = -1 * math.sin(steering) * F_l_front
+    F_lat_wheels = math.cos(steering) * F_l_front + F_l_rear
+
+    F_long = F_traction + F_drag + F_rolling + F_long_wheels
+    F_lat = F_lat_wheels
+
+    F_x = math.sin(theta) * F_long + math.cos(theta) * F_lat
+    F_y = math.cos(theta) * F_long - math.sin(theta) * F_lat
+
+    Net_Torque = F_l_front * L/2 - F_l_rear * L/2
+    return calc_change(position, velocity, angle, dt, mass, moment, [F_x, F_y],
+                       Net_Torque)
+
+
+def calc_change(position, velocity, angle, dt, mass, moment, F_net, T_net):
     """
         Inputs:
             position->  list object holding x and y: (x, y)
@@ -63,7 +102,7 @@ def update(position, velocity, angle, dt, mass, moment):
     return [position, velocity, angle]
 
 
-def integrate(F_net, mass, pos, vel, dt=delta_time):
+def integrate(F_net, mass, pos, vel, dt):
     """
         Function to do all of the heavy lifting for the physics function.
         Calculates both the rotational and linear motions.
