@@ -1,7 +1,9 @@
 from world import World
 from view import View
 import pygame
-from math import sin, cos
+from math import pi
+FORCE = -1000
+INCREMENT = pi / 16
 
 
 def main():
@@ -22,9 +24,12 @@ def main():
             keys_pressed[idx] += int(event_keys[idx] in down_keys) - int(event_keys[idx] in up_keys)
 
         # Changes angular velocity based on keys pressed (should be changed to make it accelerate)
-        world.car.velocity[0] = (-keys_pressed[0]+keys_pressed[1])*-sin(world.car.angle[0])*100
-        world.car.velocity[1] = (-keys_pressed[0]+keys_pressed[1])*cos(world.car.angle[0])*100
-        world.car.angle[1] = keys_pressed[2]-keys_pressed[3]
+        # world.car.velocity[0] = (-keys_pressed[0]+keys_pressed[1])*-sin(world.car.angle[0])*100
+        # world.car.velocity[1] = (-keys_pressed[0]+keys_pressed[1])*cos(world.car.angle[0])*100
+        # world.car.angle[1] = keys_pressed[2]-keys_pressed[3]
+
+        world.car.driving_force = (keys_pressed[0]-keys_pressed[1]) * FORCE
+        world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
 
         view.draw_scene(world)
         world.car.update_pos()

@@ -25,15 +25,26 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     """
     # Initialize all constant values: some are magic numbers
     max_slip_angle = math.radians(6)
-    C_cornering = (mass * 9.81) / (2 * max_slip_angle)
+    # C_cornering = (mass * 9.81) / (2 * max_slip_angle)
+    C_cornering = 5
+    print(C_cornering)
     L = 3  # Wheelbase in meters
     C_drag = 0.4257
     C_rolling = 30 * C_drag
-    speed = (velocity[0]**2 + velocity[1]**2)**-.5
+    speed = (velocity[0]**2 + velocity[1]**2)**.5
+
+    car_vector = [math.sin(angle[0]), math.cos(angle[0])]
+    direction = velocity[0] * car_vector[0] + velocity[1] * car_vector[1]
+    if not direction == 0:
+        direction = direction / abs(direction)
 
     theta = angle[0]
-    beta = math.atan(velocity[0] / velocity[1]) - theta
-    slip_angle = steering - beta
+    if velocity[1] == 0:
+        beta = 0
+        slip_angle = 0
+    else:
+        beta = math.atan(velocity[0] / velocity[1]) - theta
+        slip_angle = steering - beta
 
     if slip_angle > max_slip_angle:
         slip_angle = max_slip_angle
@@ -45,8 +56,8 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     elif beta < -max_slip_angle:
         beta = -max_slip_angle
 
-    F_drag = -C_drag * speed
-    F_rolling = -C_rolling * speed
+    F_drag = -C_drag * speed * direction
+    F_rolling = -C_rolling * speed * direction
     F_l_front = C_cornering * slip_angle
     F_l_rear = C_cornering * beta
 
@@ -59,6 +70,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     F_x = math.sin(theta) * F_long + math.cos(theta) * F_lat
     F_y = math.cos(theta) * F_long - math.sin(theta) * F_lat
 
+    print(F_l_front, ':', F_l_rear)
     Net_Torque = F_l_front * L/2 - F_l_rear * L/2
     return calc_change(position, velocity, angle, dt, mass, moment, [F_x, F_y],
                        Net_Torque)
