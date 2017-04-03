@@ -29,6 +29,9 @@ def main():
 
 
 
+
+
+
         view.draw_scene(world)
         world.car.update_pos()
 

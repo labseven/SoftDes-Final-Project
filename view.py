@@ -44,6 +44,7 @@ class View():
             self.last_pos = e.pos
 
         self.draw_decorations(self.objects)
+
         self.draw_car(world.car)
         pygame.display.flip()
 
@@ -85,6 +86,15 @@ class View():
             img_rect = img_sprite.get_rect()
             self.screen.blit(img_sprite, (obj[1], obj[2]))
 
+    def roundline(self, world, color, e, end, radius):
+        start = e.pos
+        dx = end[0]-start[0]
+        dy = end[1]-start[1]
+        distance = max(abs(dx), abs(dy))
+        for i in range(distance):
+            x = int( start[0]+float(i)/distance*dx)
+            y = int( start[1]+float(i)/distance*dy)
+            world.road[x:x+radius, y:y+radius] = 255
 
     def roundline(self, world, color, e, end, radius):
         start = e.pos
