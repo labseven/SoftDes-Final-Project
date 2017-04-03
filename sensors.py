@@ -4,7 +4,7 @@
 The sensor class
 """
 
-from math import sin, cos, sqrt
+from math import sin, cos, sqrt, pi
 import numpy as np
 
 class Sensors():
@@ -12,7 +12,7 @@ class Sensors():
     Sensor implemented:
     Lidar with n points
     """
-    def __init__(self, car, road, world_size, lidar_num = 9, lidar_max_angle = 90):
+    def __init__(self, car, road, world_size, lidar_num = 20, lidar_max_angle = pi-.01):
         """
         Initializes the sensor class.
         """
@@ -22,13 +22,11 @@ class Sensors():
         self.world_size = world_size
 
         self.lidar_angles = []
-
         # Add equally spaced sensors
-        lidar_spacing = lidar_num / (2 * lidar_max_angle)
+        lidar_spacing = (2 * lidar_max_angle) / (lidar_num)
+
         for i in range(lidar_num):
             self.lidar_angles.append(-lidar_max_angle + (i * lidar_spacing))
-
-        print(self.lidar_angles)
 
 
     def get_lidar_data(self):
@@ -62,6 +60,7 @@ class Sensors():
 
         # print(self.car.angle[0])
         ray_angle = angle - self.car.angle[0]
+
         dirX = sin(ray_angle)
         dirY = cos(ray_angle)
 
