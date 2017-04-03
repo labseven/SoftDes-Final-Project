@@ -12,7 +12,10 @@ from math import sin, cos
 class View():
     def __init__(self, size=(1000,1000), map=None):
         self.bg_color = (70, 204, 63)
+
         self.screen = pygame.display.set_mode(size)
+        self.draw_on = False
+        self.last_pos = (0, 0)
         self.draw_on = False
         self.last_pos = (0, 0)
 
@@ -75,7 +78,10 @@ class View():
             x = int( start[0]+float(i)/distance*dx)
             y = int( start[1]+float(i)/distance*dy)
             world.road[x:x+radius, y:y+radius] = 255
+<<<<<<< HEAD
 
+=======
+>>>>>>> 28f48b3f8cc2a671f255108804fed66e5c8bb6ed
 
 if __name__ == "__main__":
     view = View()
