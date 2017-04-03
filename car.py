@@ -1,4 +1,4 @@
-from sensors import sensors
+from sensors import Sensors
 from physics import physics
 
 
