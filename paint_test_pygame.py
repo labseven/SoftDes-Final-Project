@@ -2,8 +2,7 @@ import pygame, random
 
 screen = pygame.display.set_mode((800,600))
 pygame.display.set_caption('Draw Your Track')
-background_colour = (42, 483, 51)
-screen.fill(background_colour)
+
 
 
 draw_on = False
@@ -26,7 +25,7 @@ try:
         if e.type == pygame.QUIT:
             raise StopIteration
         if e.type == pygame.MOUSEBUTTONDOWN:
-            color = (0, 0, 0)
+            color = (255, 255, 255)
             pygame.draw.circle(screen, color, e.pos, radius)
             draw_on = True
         if e.type == pygame.MOUSEBUTTONUP:
@@ -36,7 +35,7 @@ try:
                 pygame.display.update(pygame.draw.circle(screen, color, e.pos, radius))
                 roundline(screen, color, e.pos, last_pos,  radius)
             last_pos = e.pos
-        #pygame.display.flip()
+
 
 except StopIteration:
     pass
