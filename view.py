@@ -23,9 +23,9 @@ class View():
         Draws one frame of a scene.
         """
         self.screen.fill(self.bg_color)  # Draw background color
-        self.render_road(world.road)
+        self.render_road(self.world.road)
         self.draw_decorations(self.objects)
-        self.draw_car(world.car)
+        self.draw_car(self.world.car)
         pygame.display.flip()
 
     def render_road(self, road):
