@@ -7,6 +7,7 @@ The sensor class
 from math import sin, cos, sqrt, pi
 import numpy as np
 
+
 class Sensors():
     """
     Sensor implemented:
@@ -28,7 +29,6 @@ class Sensors():
         for i in range(lidar_num):
             self.lidar_angles.append(-lidar_max_angle + (i * lidar_spacing))
 
-
     def get_lidar_data(self):
         """
         Outputs a list of distances.
@@ -41,7 +41,6 @@ class Sensors():
             hit_pos.append(lidar[1])
 
         return distances, hit_pos
-
 
     def get_lidar_distance(self, angle):
         """
