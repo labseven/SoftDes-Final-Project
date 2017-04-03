@@ -6,8 +6,7 @@ from math import sin, cos
 
 def main():
     size = (1000,1000)
-    view = View(size=size)
-    world = World(size)
+    view = View(size=size, map_in=World(size))
 
     clock = pygame.time.Clock()
     event_keys = (pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a)
@@ -23,13 +22,12 @@ def main():
             keys_pressed[idx] += int(event_keys[idx] in down_keys) - int(event_keys[idx] in up_keys)
 
         # Changes angular velocity based on keys pressed (should be changed to make it accelerate)
-        world.car.velocity[0] = (-keys_pressed[0]+keys_pressed[1])*-sin(world.car.angle[0])*100
-        world.car.velocity[1] = (-keys_pressed[0]+keys_pressed[1])*cos(world.car.angle[0])*100
-        world.car.angle[1] = keys_pressed[2]-keys_pressed[3]
+        world.car.velocity[0] = -(-keys_pressed[0]+keys_pressed[1])*-sin(world.car.angle[0])*100
+        world.car.velocity[1] = -(-keys_pressed[0]+keys_pressed[1])*cos(world.car.angle[0])*100
+        world.car.angle[1] = (keys_pressed[2]-keys_pressed[3])
 
         view.draw_scene(world)
         world.car.update_pos()
-        print(world.car.sensors.get_lidar_distance(0))
 
         clock.tick(60)
 
