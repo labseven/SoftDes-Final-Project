@@ -41,7 +41,7 @@ class Sensors():
             hit_pos.append(lidar[1])
 
         return distances, hit_pos
-     
+
 
     def get_lidar_distance(self, angle):
         """
@@ -56,8 +56,10 @@ class Sensors():
         mapY = int(locationY)
 
         # What the value of the map where the car is at
-        curr_map_value = self.road[mapX][mapY]
-
+        try:
+            curr_map_value = self.road[mapX][mapY]
+        except:
+            curr_map_value = 0
         # print(self.car.angle[0])
         ray_angle = angle - self.car.angle[0]
 
