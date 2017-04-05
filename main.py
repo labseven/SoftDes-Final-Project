@@ -2,8 +2,8 @@ from world import World
 from view import View
 import pygame
 from math import pi
-FORCE = -1000
-INCREMENT = pi / 16
+FORCE = -500
+INCREMENT = pi / 8
 
 
 def main():

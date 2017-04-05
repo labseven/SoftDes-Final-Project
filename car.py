@@ -16,7 +16,7 @@ class Car:
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
-        self.size = (mass/50, mass/25)
+        self.size = (4, 8)
         self.color = car_color
 
     def update_pos(self):

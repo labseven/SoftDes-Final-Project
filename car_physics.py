@@ -25,25 +25,31 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     """
     L = 3  # Wheelbase in meters
 
-    a = 1/3
+    a = 1/10
     b = 1 - a
     a = a*L
     b = b*L
+
+    theta = angle[0]
+    omega = angle[1]
+
     # Initialize all constant values: some are magic numbers
-    max_slip_angle = math.radians(6)
+    max_slip_angle = math.radians(12)
     # C_cornering = (mass * 9.81) / (2 * max_slip_angle)
     C_cornering = 2000
     C_drag = 0.4257
     C_rolling = 30 * C_drag
     speed = (velocity[0]**2 + velocity[1]**2)**.5
 
-    car_vector = [math.sin(angle[0]), math.cos(angle[0])]
+    car_vector = [math.sin(theta), math.cos(theta)]
     direction = velocity[0] * car_vector[0] + velocity[1] * car_vector[1]
     if not direction == 0:
         direction = direction / abs(direction)
 
-    theta = angle[0]
-    omega = angle[1]
+    # Catches divide by zero error: Three cases
+    #  x and y 0: angle = 0
+    #  y 0, x +: angle = 90
+    #  y 0 x -: angle -90
     if velocity[1] == 0:
         if velocity[0] == 0:
             beta = 0
@@ -56,15 +62,23 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
 
     angle_sep = theta - beta
     v_lat = math.sin(angle_sep) * speed
+
+    if v_lat > speed:
+        v_lat = 0
+    elif v_lat < -speed:
+        v_lat = 0
+
     v_long = math.cos(angle_sep) * speed
-    print(v_lat, ":", v_long, "||", velocity[0], velocity[1])
+    print((int)(v_lat*100)/100, "\t", (int)(v_long*10)/10, "\t",
+          (int)(velocity[0]*10)/10, '\t', (int)(velocity[1]*10)/10,
+          "\t", (int)(theta*10)/10, '\t', (int)(omega*10)/10)
     if speed < 1:
         angle[1] = 0
         slip_angle_f = 0
         slip_angle_r = 0
     else:
-        slip_angle_f = steering - ((a * omega + v_lat)/v_long)
-        slip_angle_r = ((b * omega + v_lat)/v_long)
+        slip_angle_f = steering - math.atan((a * omega + v_lat)/v_long)
+        slip_angle_r = math.atan((b * omega + v_lat)/v_long)
 
         if slip_angle_f > max_slip_angle:
             slip_angle_f = max_slip_angle
