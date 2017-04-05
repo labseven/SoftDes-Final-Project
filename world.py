@@ -23,5 +23,5 @@ class World():
         Initializes the numpy matrix for the road and creates a car.
         """
         self.world_map = World_Map(size)
-        self.road = misc.imread('track.png', mode='L')
+        self.road = misc.imread('assets/track.png', mode='L')
         self.car = Car(self.road, size, [500, 500], [0, 1], [0.1, 0], car_color=(randint(0, 255), randint(0, 255), randint(0, 255)))
