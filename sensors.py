@@ -41,6 +41,7 @@ class Sensors():
             hit_pos.append(lidar[1])
 
         return distances, hit_pos
+     
 
     def get_lidar_distance(self, angle):
         """

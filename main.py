@@ -6,7 +6,8 @@ from math import sin, cos
 
 def main():
     size = (1000,1000)
-    world=World(size)
+    world = World(size)
+
     view = View(size=size, map_in=world)
 
     clock = pygame.time.Clock()

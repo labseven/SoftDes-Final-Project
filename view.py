@@ -6,7 +6,7 @@ The View class.
 import pygame
 from pygame.surfarray import blit_array
 import numpy as np
-from math import sin, cos
+from math import cos
 from random import randint
 
 
@@ -15,19 +15,29 @@ class View():
         self.bg_color = (70, 204, 63)
 
         self.screen = pygame.display.set_mode(size)
-        self.objects = [("corn.png", randint(0, 900), randint(0, 900)) for x in range(100)]
-        self.objects.extend([("barn.png", randint(0, 900), randint(0, 900))])
         self.world = map_in
         self.draw_on = False
         self.last_pos = (0, 0)
+        self.objs = self.build_obj_canvas()
+
+
+    def build_obj_canvas(self):
+        objects = [("assets/corn.png", randint(0, 999), randint(0, 999)) for x in range(5000)]
+        barn = [("assets/barn.png", randint(0, 900), randint(0, 900))]
+        obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
+        valid_objects = [obj for obj in objects if self.world.road[obj[1], obj[2]] == 0]
+        obj_surfaces = self.draw_decorations(valid_objects, obj_surfaces)
+        obj_surfaces = self.draw_decorations(barn, obj_surfaces)
+
+        return obj_surfaces
+
 
     def draw_scene(self, world):
         """
         Draws one frame of a scene.
         """
         self.screen.fill(self.bg_color)  # Draw background color
-        self.render_road(world.road)
-
+        
         radius = 100
         color = (255, 255, 255)
         e = pygame.event.wait()
@@ -44,8 +54,10 @@ class View():
                 self.roundline(world, color, e, self.last_pos,  radius)
             self.last_pos = e.pos
 
-        self.draw_decorations(self.objects)
-        self.draw_car(world.car)
+        self.render_road(self.world.road)
+        self.screen.blit(self.objs, (0, 0))
+        self.draw_car(self.world.car)
+
         pygame.display.flip()
 
     def render_road(self, road):
@@ -60,16 +72,17 @@ class View():
         """
         Draws the car onto the frame.
         """
-        x, y = car.position
+        x_pos, y_pos = car.position
         theta = car.angle[0]
-        w, l = car.size
 
-        vertices = [(x-l*sin(theta)-w*cos(theta), y+cos(theta)*l-w*sin(theta)),
-                    (x-(l*sin(theta))+(w*cos(theta)), y+(cos(theta)*l)+(w*sin(theta))),
-                    (x+sin(theta)*l+cos(theta)*w, y-cos(theta)*l+sin(theta)*w),
-                    (x+sin(theta)*l-cos(theta)*w, y-cos(theta)*l-sin(theta)*w)]
-        pygame.draw.polygon(self.screen, car.color, vertices)  # Draw car
-        pygame.draw.polygon(self.screen, (0, 0, 0), vertices, 2)  # Draw outline
+        car_sprite = pygame.image.load("assets/car.png")
+        car_rect = car_sprite.get_rect(center=(16, 32))
+
+        rot_car = pygame.transform.rotate(car_sprite, 180-theta*(180/3.1416))
+        new_rect = rot_car.get_rect(center=car_rect.center)
+        new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
+
+        self.screen.blit(rot_car, new_rect)
         self.draw_lidar(car)
 
     def draw_lidar(self, car):
@@ -78,13 +91,13 @@ class View():
         """
 
         for hit in car.lidar_hits:
-            pygame.draw.line(self.screen, (250,0,0), car.position, hit)
+            pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+16, car.position[1]+32), hit)
 
-    def draw_decorations(self, objects):
+    def draw_decorations(self, objects, screen):
         for obj in objects:
             img_sprite = pygame.image.load(obj[0])
-            img_rect = img_sprite.get_rect()
-            self.screen.blit(img_sprite, (obj[1], obj[2]))
+            screen.blit(img_sprite, (obj[1], obj[2]))
+        return screen
 
     def roundline(self, world, color, e, end, radius):
         start = e.pos
@@ -95,6 +108,7 @@ class View():
             x = int( start[0]+float(i)/distance*dx)
             y = int( start[1]+float(i)/distance*dy)
             world.road[x:x+radius, y:y+radius] = 255
+            
 
 if __name__ == "__main__":
     view = View()
