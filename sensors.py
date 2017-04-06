@@ -38,13 +38,16 @@ class Sensors():
         return distances, hit_pos
 
 
-    def get_lidar_distance(self, angle):
+    def get_lidar_distance(self, angle, return_square_dist=False):
         """ Return the distance from car to the nearest wall, in the direction
         of angle. Also returns coordinates of lidar hit.
 
+
         Uses raycasting to find the hit location.
         See (lodev.org/cgtutor/raycasting.html) for more information.
-        Return: Distance, [mapX, mapY]
+
+        Input: angle of ray (relative to car), return_square_distance (for performance)
+        Returns: Distance, [mapX, mapY]
         """
 
         locationX = self.car.position[0]
@@ -114,8 +117,10 @@ class Sensors():
             if self.road[mapX][mapY] != curr_map_value:
                 break
 
-        # TODO: Optimize this.
-        # Can remove sqrt and then compare square of the distance
-        distance = sqrt((mapX-locationX)**2 + (mapY-locationY)**2)
+        # Whether to return square of the distance (for performance)
+        if return_square_dist:
+            distance = (mapX-locationX)**2 + (mapY-locationY)**2
+        else:
+            distance = sqrt((mapX-locationX)**2 + (mapY-locationY)**2)
 
         return distance, [mapX, mapY]
