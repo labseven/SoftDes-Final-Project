@@ -46,22 +46,31 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     if not direction == 0:
         direction = direction / abs(direction)
 
-    # Catches divide by zero error: Three cases
-    #  x and y 0: angle = 0
-    #  y 0, x +: angle = 90
-    #  y 0 x -: angle -90
-    if(velocity[1] == 0):
+    if velocity[1] == 0:
         velocity[1] = .001
-    beta = math.atan(velocity[0] / velocity[1])
-    print(velocity[0] / velocity[1], '\t', beta)
+
+    # velocity_ratio = abs(velocity[0] / velocity[1])
+    # coefficient = 1
+    # if velocity[0] > 0 or velocity[1] > 0:
+    #     coefficient = -1
+    #     print('A')
+
+    # if velocity[0] < 0 and velocity[1] > 0:
+    #     coefficient = -1
+    #     print('B')
+
+    # beta = math.atan(coefficient * velocity_ratio)
+    vertical_unit = [0, -1]
+    # top = velocity[0] * vertical_unit[0] + velocity[1] * vertical_unit[1]
+    # bottom = (velocity[0]**2 + velocity[1]**2)**.5 + (vertical_unit[0]**2 + vertical_unit[1]**2)**.5
+    # beta = math.acos(top / bottom)
+    beta = math.acos(-velocity[1] / (velocity[0]**2 + velocity[1]**2)**.5)
+    if velocity[0] > 0:
+        beta = 2*math.pi - beta
+    print(velocity[0], '\t',  velocity[1], '\t', beta)
     angle_sep = theta - beta
+
     v_lat = math.sin(angle_sep) * speed
-
-    if v_lat > speed:
-        v_lat = 0
-    elif v_lat < -speed:
-        v_lat = 0
-
     v_long = math.cos(angle_sep) * speed
     """print((int)(velocity[0]*10)/10, '\t', (int)(velocity[1]*1000)/1000,
           "\t", (int)(theta*10)/10, '\t', (int)(omega*10)/10,
