@@ -3,6 +3,7 @@ from view import View
 import pygame
 from math import pi
 FORCE = -500
+BRAKING = -1000
 INCREMENT = pi / 8
 
 
@@ -28,7 +29,7 @@ def main():
         # world.car.velocity[1] = (-keys_pressed[0]+keys_pressed[1])*cos(world.car.angle[0])*100
         # world.car.angle[1] = keys_pressed[2]-keys_pressed[3]
 
-        world.car.driving_force = (keys_pressed[0]-keys_pressed[1]) * FORCE
+        world.car.driving_force = (keys_pressed[0] * FORCE -keys_pressed[1] * BRAKING)
         world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
 
         view.draw_scene(world)
