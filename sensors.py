@@ -26,9 +26,12 @@ class Sensors():
         for i in range(lidar_num):
             self.lidar_angles.append(-lidar_max_angle + (i * lidar_spacing))
 
-    def get_lidar_data(self, lidar_angles=self.lidar_angles):
+    def get_lidar_data(self, lidar_angles=None):
         """ Outputs a list of lidar distances.
         """
+        if lidar_angles is None:
+            lidar_angles = self.lidar_angles
+        
         distances = []
         hit_pos = []
         for angle in lidar_angles:
