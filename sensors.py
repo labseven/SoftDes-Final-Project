@@ -1,7 +1,7 @@
 """
 @Author: Adam Novotny
 
-The sensor class
+The Sensor class
 """
 
 from math import sin, cos, sqrt, pi
@@ -9,8 +9,9 @@ import numpy as np
 
 
 class Sensors():
-    """
-    Sensor implemented:
+    """ Sensor class. Returns sensor values.
+
+    Sensors implemented:
     Lidar with n points
     """
     def __init__(self, car, road, world_size, lidar_num = 20, lidar_max_angle = pi-.01):
