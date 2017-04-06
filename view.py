@@ -19,15 +19,19 @@ class View():
         self.draw_on = False
         self.last_pos = (0, 0)
         self.objs = self.build_obj_canvas()
+        self.road_mask = self.get_road_surface(self.world.road)
 
 
     def build_obj_canvas(self):
         objects = [("assets/corn.png", randint(0, 999), randint(0, 999)) for x in range(5000)]
+        dirt = [("assets/dirt.png", randint(0, 999), randint(0, 999)) for x in range(500)]
         barn = [("assets/barn.png", randint(0, 900), randint(0, 900))]
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         valid_objects = [obj for obj in objects if self.world.road[obj[1], obj[2]] == 0]
+        valid_dirt = [obj for obj in dirt if self.world.road[obj[1], obj[2]] != 0]
         obj_surfaces = self.draw_decorations(valid_objects, obj_surfaces)
         obj_surfaces = self.draw_decorations(barn, obj_surfaces)
+        obj_surfaces = self.draw_decorations(valid_dirt, obj_surfaces)
 
         return obj_surfaces
 
@@ -55,19 +59,22 @@ class View():
                     self.roundline(world, color, e, self.last_pos,  radius)
                 self.last_pos = e.pos
 
-        self.render_road(self.world.road)
+        self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
         self.screen.blit(self.objs, (0, 0))
         self.draw_car(self.world.car)
 
         pygame.display.flip()
 
-    def render_road(self, road):
+    def get_road_surface(self, road):
         """
         Renders the pixels for a road on the frame.
         """
-        mask = pygame.Surface((road.shape[0], road.shape[1]))
-        blit_array(mask, np.ndarray.astype(road, 'float32'))  # Convert road matrix into pygame surface
-        self.screen.blit(mask, (0, 0), None, pygame.BLEND_RGB_ADD)  # Mask road and background together
+        mask = pygame.Surface((road.shape[0], road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
+        for x in range(0, road.shape[0]):
+            for y in range(0, road.shape[1]):
+                if road[x,y] > 0:
+                    mask.set_at((x, y), (150, 115, 33))
+        return mask
 
     def draw_car(self, car):
         """
@@ -95,9 +102,12 @@ class View():
             pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+16, car.position[1]+32), hit)
 
     def draw_decorations(self, objects, screen):
+        """
+        Build a surface that contains all of the decorative objects.
+        """
         for obj in objects:
             img_sprite = pygame.image.load(obj[0])
-            screen.blit(img_sprite, (obj[1], obj[2]))
+            screen.blit(img_sprite, (obj[1]-32, obj[2]-64))
         return screen
 
     def roundline(self, world, color, e, end, radius):
@@ -106,8 +116,8 @@ class View():
         dy = end[1]-start[1]
         distance = max(abs(dx), abs(dy))
         for i in range(distance):
-            x = int( start[0]+float(i)/distance*dx)
-            y = int( start[1]+float(i)/distance*dy)
+            x = int(start[0]+float(i)/distance*dx)
+            y = int(start[1]+float(i)/distance*dy)
             world.road[x:x+radius, y:y+radius] = 255
 
 
