@@ -25,7 +25,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     """
     L = 3  # Wheelbase in meters
 
-    a = 1/10
+    a = 1/3
     b = 1 - a
     a = a*L
     b = b*L
@@ -37,7 +37,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     max_slip_angle = math.radians(12)
     # C_cornering = (mass * 9.81) / (2 * max_slip_angle)
     C_cornering = 2000
-    C_drag = 0.4257
+    C_drag = 0.75
     C_rolling = 30 * C_drag
     speed = (velocity[0]**2 + velocity[1]**2)**.5
 
@@ -50,16 +50,10 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     #  x and y 0: angle = 0
     #  y 0, x +: angle = 90
     #  y 0 x -: angle -90
-    if velocity[1] == 0:
-        if velocity[0] == 0:
-            beta = 0
-        elif velocity[0] > 0:
-            beta = math.pi/2
-        else:
-            beta = -math.pi/2
-    else:
-        beta = math.atan(velocity[0] / velocity[1])
-
+    if(velocity[1] == 0):
+        velocity[1] = .001
+    beta = math.atan(velocity[0] / velocity[1])
+    print(velocity[0] / velocity[1], '\t', beta)
     angle_sep = theta - beta
     v_lat = math.sin(angle_sep) * speed
 
@@ -69,9 +63,9 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
         v_lat = 0
 
     v_long = math.cos(angle_sep) * speed
-    print((int)(v_lat*100)/100, "\t", (int)(v_long*10)/10, "\t",
-          (int)(velocity[0]*10)/10, '\t', (int)(velocity[1]*10)/10,
-          "\t", (int)(theta*10)/10, '\t', (int)(omega*10)/10)
+    """print((int)(velocity[0]*10)/10, '\t', (int)(velocity[1]*1000)/1000,
+          "\t", (int)(theta*10)/10, '\t', (int)(omega*10)/10,
+          '\t', (int)(beta*10)/10, '\t', (int)(angle_sep*10)/10)"""
     if speed < 1:
         angle[1] = 0
         slip_angle_f = 0
