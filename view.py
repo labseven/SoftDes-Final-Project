@@ -4,11 +4,11 @@ The View class.
 """
 
 import pygame
-from pygame.surfarray import blit_array
-import numpy as np
-from math import cos
 from random import randint
+from collections import namedtuple
+import numpy as np
 
+Sprite = namedtuple('Sprite', 'surf x y')
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
@@ -23,15 +23,17 @@ class View():
 
 
     def build_obj_canvas(self):
-        objects = [("assets/corn.png", randint(0, 999), randint(0, 999)) for x in range(5000)]
-        # dirt = [("assets/dirt.png", randint(0, 999), randint(0, 999)) for x in range(500)]
-        barn = [("assets/barn.png", randint(0, 900), randint(0, 900))]
+        # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
-        valid_objects = [obj for obj in objects if self.world.road[obj[1], obj[2]] == 0]
-        # valid_dirt = [obj for obj in dirt if self.world.road[obj[1], obj[2]] != 0]
-        obj_surfaces = self.draw_decorations(valid_objects, obj_surfaces)
-        obj_surfaces = self.draw_decorations(barn, obj_surfaces)
-        # obj_surfaces = self.draw_decorations(valid_dirt, obj_surfaces)
+        corn_surf = pygame.image.load("assets/corn.png") # Load corn image
+        barn_surf = pygame.image.load("assets/barn.png") # Load barn image
+
+        all_objs = [Sprite(barn_surf, 500, 500)]
+        all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
+                        for x in range(5000)] if self.world.road[obj.x, obj.y] == 0
+                        and not (-50 <= obj.x-all_objs[0].x <= 50 and
+                        -50 <= obj.y-all_objs[0].y <= 50)])
+        obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
 
         return obj_surfaces
 
@@ -52,6 +54,7 @@ class View():
                 self.draw_on = True
             if e.type == pygame.MOUSEBUTTONUP:
                 # self.road_mask = self.get_road_surface(self.world.road)
+                self.objs = self.build_obj_canvas()
                 self.draw_on = False
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
@@ -61,7 +64,7 @@ class View():
                 self.last_pos = e.pos
 
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        # self.screen.blit(self.objs, (0, 0))
+        self.screen.blit(self.objs, (0, 0))
         self.draw_car(self.world.car)
 
         pygame.display.flip()
@@ -99,7 +102,6 @@ class View():
         """
         Draws lidar beams.
         """
-
         for hit in car.lidar_hits:
             pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+16, car.position[1]+32), hit)
 
@@ -107,9 +109,9 @@ class View():
         """
         Build a surface that contains all of the decorative objects.
         """
-        for obj in objects:
-            img_sprite = pygame.image.load(obj[0])
-            screen.blit(img_sprite, (obj[1]-32, obj[2]-64))
+        for sprite in objects:
+            size = sprite.surf.get_size()
+            screen.blit(sprite.surf, (sprite.x-size[0]/2, sprite.y-size[1]))
         return screen
 
     def roundline(self, world, color, e, end, radius):
@@ -131,6 +133,7 @@ class View():
             y = int(start[1]+float(i)/distance*dy)
 
             world.road[x-offset:x+offset, y-offset:y+offset] += pix_array
+            # world.road[x-offset:x+offset, y-offset:y+offset] = np.clip(world.road[x-offset:x+offset, y-offset:y+offset], 0, 255)
             pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
 
 
