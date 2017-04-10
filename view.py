@@ -71,7 +71,7 @@ class View():
                 self.last_pos = e.pos
 
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        # self.screen.blit(self.objs, (0, 0))
+        self.screen.blit(self.objs, (0, 0))
         self.draw_car(world.car)
 
         pygame.display.flip()
@@ -126,14 +126,14 @@ class View():
         #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
-    def press_button(self):
-        for event in pygame.event.get():
+    def press_button(self, events):
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size)
-                    # self.road_mask = self.get_road_surface(self.world.road)
+                    self.road_mask = self.get_road_surface(self.world.road)
 
     def roundline(self, world, color, e, end, radius):
         circ_surface = pygame.Surface((radius, radius))

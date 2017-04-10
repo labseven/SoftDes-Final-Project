@@ -29,7 +29,7 @@ def main():
         view.draw_scene(world, events)
         world.car.update_pos()
 
-        view.press_button()
+        view.press_button(events)
 
         clock.tick(60)
 
