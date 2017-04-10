@@ -36,6 +36,7 @@ def physics(position, velocity, angle, dt, mass, moment, F_net, T_net,):
 
     theta = angle[0]
     omega = angle[1]
+    
     [x, vx] = integrate(F_x, mass, x, vx, dt)
     [y, vy] = integrate(F_y, mass, y, vy, dt)
     [theta, omega] = integrate(T_net, moment, theta, omega, dt)
