@@ -61,7 +61,7 @@ class View():
                 self.last_pos = e.pos
 
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        # self.screen.blit(self.objs, (0, 0))
+        self.screen.blit(self.objs, (0, 0))
         self.draw_car(world.car)
 
         pygame.display.flip()
