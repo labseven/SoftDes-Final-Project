@@ -4,6 +4,7 @@ The View class.
 """
 
 import pygame
+import Buttons
 from pygame.surfarray import blit_array
 import numpy as np
 from math import cos
@@ -14,11 +15,14 @@ class View():
     def __init__(self, size=(1000, 1000), map_in=None):
         self.bg_color = (70, 204, 63)
 
+        self.size = size
         self.screen = pygame.display.set_mode(size)
         self.world = map_in
         self.draw_on = False
         self.last_pos = (0, 0)
         self.objs = self.build_obj_canvas()
+
+        self.Button1 = Buttons.Button()
 
 
     def build_obj_canvas(self):
@@ -32,7 +36,7 @@ class View():
         return obj_surfaces
 
 
-    def draw_scene(self, world):
+    def draw_scene(self, world, events):
         """
         Draws one frame of a scene.
         """
@@ -40,7 +44,6 @@ class View():
 
         radius = 100
         color = (255, 255, 255)
-        events = pygame.event.get()
         for e in events:
             if e.type == pygame.QUIT:
                 raise StopIteration
@@ -85,6 +88,7 @@ class View():
 
         self.screen.blit(rot_car, new_rect)
         self.draw_lidar(car)
+        self.draw_buttons()
 
     def draw_lidar(self, car):
         """
@@ -99,6 +103,19 @@ class View():
             img_sprite = pygame.image.load(obj[0])
             screen.blit(img_sprite, (obj[1], obj[2]))
         return screen
+
+    def draw_buttons(self):
+        #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+        self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
+
+    def press_button(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if self.Button1.pressed(pygame.mouse.get_pos()):
+                    self.world.road = np.zeros(self.size)
+                    # self.road_mask = self.get_road_surface(self.world.road)
 
     def roundline(self, world, color, e, end, radius):
         start = e.pos
