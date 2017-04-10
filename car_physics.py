@@ -68,7 +68,8 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     if velocity[0] > 0:
         beta = 2*math.pi - beta
     # speedometer print statement
-    print(speed, end="\r")
+    speed_mph = (int)(2.23694 * speed * 100) / 100
+    print(speed_mph, 'mph', end="\r")
 
     # Defines the difference between car's orientation and direction of travel
     angle_sep = theta - beta
@@ -79,7 +80,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     v_long = math.cos(angle_sep) * speed
 
     # Below 1 m/s truncates angle calculations so as to reduce sign changes.
-    if speed < 1:
+    if speed < .1:
         angle[1] = 0
         slip_angle_f = 0
         slip_angle_r = 0

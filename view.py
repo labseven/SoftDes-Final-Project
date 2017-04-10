@@ -14,6 +14,8 @@ from collections import namedtuple
 Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
 BG_COLOR = (70, 204, 63)
+sprite_width = 16
+sprite_height = 32
 
 
 class View():
@@ -97,14 +99,15 @@ class View():
         theta = -car.angle[0]
 
         car_sprite = pygame.image.load("assets/car.png")
-        car_rect = car_sprite.get_rect(center=(16, 32))
+        car_sprite = pygame.transform.scale(car_sprite, (sprite_width, sprite_height))
+        car_rect = car_sprite.get_rect()
 
         rot_car = pygame.transform.rotate(car_sprite, 180-theta*(180/3.1416))
         new_rect = rot_car.get_rect(center=car_rect.center)
         new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
 
-        self.screen.blit(rot_car, new_rect)
         self.draw_lidar(car)
+        self.screen.blit(rot_car, new_rect)
         self.draw_buttons()
 
     def draw_lidar(self, car):
@@ -112,7 +115,7 @@ class View():
         Draws lidar beams.
         """
         for hit in car.lidar_hits:
-            pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+16, car.position[1]+32), hit)
+            pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+sprite_width/2, car.position[1]+sprite_height/2), hit)
 
     def draw_decorations(self, objects, screen):
         """
