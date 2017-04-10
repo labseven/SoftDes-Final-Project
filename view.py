@@ -6,16 +6,16 @@ The View class.
 import pygame
 from random import randint
 from collections import namedtuple
-import numpy as np
 
 Sprite = namedtuple('Sprite', 'surf x y')
+ROAD_COLOR = (150, 115, 33)
+BG_COLOR = (70, 204, 63)
+
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
-        self.bg_color = (70, 204, 63)
-
-        self.screen = pygame.display.set_mode(size)
         self.world = map_in
+        self.screen = pygame.display.set_mode(size)
         self.draw_on = False
         self.last_pos = (0, 0)
         self.objs = self.build_obj_canvas()
@@ -42,7 +42,7 @@ class View():
         """
         Draws one frame of a scene.
         """
-        self.screen.fill(self.bg_color)  # Draw background color
+        self.screen.fill(BG_COLOR)  # Draw background color
 
         radius = 100
         color = (255, 255, 255)
@@ -53,19 +53,16 @@ class View():
                 self.roundline(world, color, e, e.pos,  radius)
                 self.draw_on = True
             if e.type == pygame.MOUSEBUTTONUP:
-                # self.road_mask = self.get_road_surface(self.world.road)
                 self.objs = self.build_obj_canvas()
                 self.draw_on = False
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
-                    # world.road[e.pos[0]:e.pos[0]+10, e.pos[1]:e.pos[1]+10] = 255
-                    # pygame.draw.rect(self.road_mask, (150, 115, 33), (e.pos[0], e.pos[1], radius, radius), 0)
                     self.roundline(world, color, e, self.last_pos,  radius)
                 self.last_pos = e.pos
 
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        self.screen.blit(self.objs, (0, 0))
-        self.draw_car(self.world.car)
+        # self.screen.blit(self.objs, (0, 0))
+        self.draw_car(world.car)
 
         pygame.display.flip()
 
@@ -77,8 +74,8 @@ class View():
 
         for x in range(0, road.shape[0]):
             for y in range(0, road.shape[1]):
-                if road[x,y] > 0:
-                    mask.set_at((x, y), (150, 115, 33))
+                if road[x, y] == 255:
+                    mask.set_at((x, y), ROAD_COLOR)
         return mask
 
     def draw_car(self, car):
@@ -115,13 +112,11 @@ class View():
         return screen
 
     def roundline(self, world, color, e, end, radius):
-        circ_surface = pygame.Surface((100, 100))
+        circ_surface = pygame.Surface((radius, radius))
         circ_surface.fill((0, 0, 0))
         pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2), int(radius/2)), int(radius/2), 0)
 
         pix_array = pygame.surfarray.pixels_red(circ_surface)
-
-        print(pix_array)
         start = e.pos
         dx = end[0]-start[0]
         dy = end[1]-start[1]
@@ -132,9 +127,22 @@ class View():
             x = int(start[0]+float(i)/distance*dx)
             y = int(start[1]+float(i)/distance*dy)
 
-            world.road[x-offset:x+offset, y-offset:y+offset] += pix_array
-            # world.road[x-offset:x+offset, y-offset:y+offset] = np.clip(world.road[x-offset:x+offset, y-offset:y+offset], 0, 255)
+            left_val = max(0, x-offset)
+            right_val = min(world.road.shape[0], x+offset)
+
+            top_val = max(0, y-offset)
+            bottom_val = min(world.road.shape[1], y+offset)
+
+            width = right_val - left_val
+            height = bottom_val - top_val
+            world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
+
+
             pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
+
+
+        world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
+
 
 
 if __name__ == "__main__":
