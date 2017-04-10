@@ -123,17 +123,19 @@ class View():
         return screen
 
     def draw_buttons(self):
+        # creates new button on top right corner of screen
         #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
+        # defines what happens when button is pressed
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
-                    self.world.road = np.zeros(self.size)
-                    self.road_mask = self.get_road_surface(self.world.road)
+                    self.world.road = np.zeros(self.size) #when pressed, contents of road matrix is cleared, aka set to 0
+                    self.road_mask = self.get_road_surface(self.world.road) #rerenders the road picture on the screen so it is clear fo road
 
     def roundline(self, world, color, e, end, radius):
         circ_surface = pygame.Surface((radius, radius))

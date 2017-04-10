@@ -26,6 +26,7 @@ def main():
         world.car.velocity[1] = -(-keys_pressed[0]+keys_pressed[1])*cos(world.car.angle[0])*100
         world.car.angle[1] = (keys_pressed[2]-keys_pressed[3])
 
+        # draws the map, car and button
         view.draw_scene(world, events)
         world.car.update_pos()
 
