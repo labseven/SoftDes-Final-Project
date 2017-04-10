@@ -1,7 +1,6 @@
 
 import car_physics
 from sensors import Sensors
-from physics import physics
 
 
 class Car():
@@ -40,4 +39,3 @@ class Car():
                                                   delta_time)
 
         self.lidar_distances, self.lidar_hits = self.sensors.get_lidar_data()
-
