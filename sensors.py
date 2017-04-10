@@ -14,17 +14,17 @@ class Sensors():
     Sensors implemented:
     Lidar with n points
     """
-    def __init__(self, car, road, world_size, lidar_num = 20, lidar_max_angle = pi-.01):
+    def __init__(self, car, road, world_size, lidar_num=20, lidar_max_angle=pi-.01):
         self.car = car
         self.road = road
         self.world_size = world_size
 
         # Create equally spaced sensors
         self.lidar_angles = []
-        lidar_spacing = (2 * lidar_max_angle) / (lidar_num)
+        lidar_spacing = (2 * -lidar_max_angle) / (lidar_num)
 
         for i in range(lidar_num):
-            self.lidar_angles.append(-lidar_max_angle + (i * lidar_spacing))
+            self.lidar_angles.append(lidar_max_angle + (i * lidar_spacing))
 
     def get_lidar_data(self, lidar_angles=None):
         """ Outputs a list of lidar distances.
@@ -71,7 +71,7 @@ class Sensors():
             # print("Off the screen")
             curr_map_value = 0
 
-        ray_angle = angle - self.car.angle[0]
+        ray_angle = angle + self.car.angle[0]
 
         dirX = sin(ray_angle)
         dirY = cos(ray_angle)

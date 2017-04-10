@@ -7,8 +7,6 @@ BRAKING = -1000
 INCREMENT = pi / 10
 steering_max = pi/2-.1
 
-import sys
-
 
 def main():
     size = (1000, 1000)
