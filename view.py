@@ -92,8 +92,9 @@ class View():
         """
         Draws the car onto the frame.
         """
+
         x_pos, y_pos = car.position
-        theta = car.angle[0]
+        theta = -car.angle[0]
 
         car_sprite = pygame.image.load("assets/car.png")
         car_rect = car_sprite.get_rect(center=(16, 32))
@@ -168,7 +169,6 @@ class View():
 
 
         world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
-
 
 
 if __name__ == "__main__":
