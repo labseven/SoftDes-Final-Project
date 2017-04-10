@@ -18,8 +18,6 @@ BG_COLOR = (70, 204, 63)
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
-        self.bg_color = (70, 204, 63)
-
         self.size = size
 
         self.world = map_in
@@ -32,15 +30,15 @@ class View():
         self.Button1 = Buttons.Button()
 
 
-    def build_obj_canvas(self):
+    def build_obj_canvas(self, barn_pos=(500, 500), num_corn=1000):
         # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
-        corn_surf = pygame.image.load("assets/corn.png") # Load corn image
-        barn_surf = pygame.image.load("assets/barn.png") # Load barn image
+        corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
+        barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
 
-        all_objs = [Sprite(barn_surf, 500, 500)]
+        all_objs = [Sprite(barn_surf, barn_pos[0], barn_pos[1])]  # Barn object
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
-                        for x in range(5000)] if self.world.road[obj.x, obj.y] == 0
+                        for x in range(num_corn)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
                         -50 <= obj.y-all_objs[0].y <= 50)])
         obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
@@ -60,18 +58,18 @@ class View():
             if e.type == pygame.QUIT:
                 raise StopIteration
             if e.type == pygame.MOUSEBUTTONDOWN:
-                self.roundline(world, color, e, e.pos,  radius)
+                self.roundline(self.world, color, e, e.pos,  radius)
                 self.draw_on = True
             if e.type == pygame.MOUSEBUTTONUP:
                 self.objs = self.build_obj_canvas()
                 self.draw_on = False
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
-                    self.roundline(world, color, e, self.last_pos,  radius)
+                    self.roundline(self.world, color, e, self.last_pos,  radius)
                 self.last_pos = e.pos
 
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        # self.screen.blit(self.objs, (0, 0))
+        self.screen.blit(self.objs, (0, 0))
         self.draw_car(world.car)
 
         pygame.display.flip()
@@ -126,44 +124,49 @@ class View():
         #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
-    def press_button(self):
-        for event in pygame.event.get():
+    def press_button(self, events):
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size)
-                    # self.road_mask = self.get_road_surface(self.world.road)
+                    self.road_mask = self.get_road_surface(self.world.road)
 
     def roundline(self, world, color, e, end, radius):
+        """
+        Draws a round line from one point to another and updates the road matrix
+        """
         circ_surface = pygame.Surface((radius, radius))
         circ_surface.fill((0, 0, 0))
+        # Builds the stencil for drawing the road
         pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2), int(radius/2)), int(radius/2), 0)
-
+        # Converts the stencil to a matrix that is usable
         pix_array = pygame.surfarray.pixels_red(circ_surface)
+
+        # Get position and distancce values for line
         start = e.pos
         dx = end[0]-start[0]
         dy = end[1]-start[1]
         distance = max(abs(dx), abs(dy))
-
-        offset = int(radius/2)
-        for i in range(distance):
-            x = int(start[0]+float(i)/distance*dx)
+        offset = int(radius/2)  # Offset so the drawing is centered around the cursor
+        for i in range(distance):  # loop through the line
+            x = int(start[0]+float(i)/distance*dx)  # Current position where we're drawing
             y = int(start[1]+float(i)/distance*dy)
 
+            # Get limits of where we're drawing the circle
             left_val = max(0, x-offset)
             right_val = min(world.road.shape[0], x+offset)
-
             top_val = max(0, y-offset)
             bottom_val = min(world.road.shape[1], y+offset)
 
+            # Updates the road matrix to reflect new drawing
             width = right_val - left_val
             height = bottom_val - top_val
             world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
 
-
+            # Draws the circle on the surface of the road
             pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
-
 
         world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
 
