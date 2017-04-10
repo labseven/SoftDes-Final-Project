@@ -31,7 +31,7 @@ class Sensors():
         """
         if lidar_angles is None:
             lidar_angles = self.lidar_angles
-        
+
         distances = []
         hit_pos = []
         for angle in lidar_angles:
@@ -65,8 +65,10 @@ class Sensors():
         # Ray goes until the map changes values
         try:
             curr_map_value = self.road[mapX][mapY]
+            # print(curr_map_value)
         except:
             # If off the screen
+            # print("Off the screen")
             curr_map_value = 0
 
         ray_angle = angle - self.car.angle[0]
