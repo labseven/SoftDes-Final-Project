@@ -1,5 +1,6 @@
+
+import car_physics
 from sensors import Sensors
-from physics import physics
 
 
 class Car():
@@ -15,18 +16,26 @@ class Car():
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
-        self.size = (mass/50, mass/25)
+        self.size = (4, 8)
+
         self.color = car_color
         self.sensors = Sensors(self, road, world_size)
         self.lidar_distances = []
         self.lidar_hits = []
 
-
     def update_pos(self):
         # F_net and T_net are inputs from keyboard or autonomous
-        F_net = [10,0]
-        delta_time = .1
-        [self.position, self.velocity, self.angle] = physics(self.position, self.velocity, self.angle, delta_time, self.mass, self.moment)
+        delta_time = .09
+
+        [self.position,
+         self.velocity,
+         self.angle] = car_physics.update_physics(self.position,
+                                                  self.velocity,
+                                                  self.angle,
+                                                  self.steering,
+                                                  self.driving_force,
+                                                  self.mass,
+                                                  self.moment,
+                                                  delta_time)
+
         self.lidar_distances, self.lidar_hits = self.sensors.get_lidar_data()
-        # print(self.lidar_distances)
-        # print(self.lidar_distances, self.lidar_hits)
