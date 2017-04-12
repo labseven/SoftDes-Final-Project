@@ -10,6 +10,7 @@ import numpy as np
 from math import cos
 from random import randint
 from collections import namedtuple
+from operator import add
 
 Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
@@ -33,6 +34,8 @@ class View():
 
         self.Button1 = Buttons.Button()
 
+        self.draw_mode = False
+        self.click_catch = True
 
     def build_obj_canvas(self):
         # Build transparent surface
@@ -64,9 +67,10 @@ class View():
             if e.type == pygame.MOUSEBUTTONDOWN:
                 self.roundline(world, color, e, e.pos,  radius)
                 self.draw_on = True
+
             if e.type == pygame.MOUSEBUTTONUP:
+
                 self.objs = self.build_obj_canvas()
-                self.draw_on = False
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
                     self.roundline(world, color, e, self.last_pos,  radius)
@@ -138,38 +142,49 @@ class View():
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size)
                     self.road_mask = self.get_road_surface(self.world.road)
+                    self.draw_mode = True
 
     def roundline(self, world, color, e, end, radius):
-        circ_surface = pygame.Surface((radius, radius))
-        circ_surface.fill((0, 0, 0))
-        pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2), int(radius/2)), int(radius/2), 0)
+        if self.draw_mode:
+            circ_surface = pygame.Surface((radius, radius))
+            circ_surface.fill((0, 0, 0))
+            pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2),
+                                                               int(radius/2)),
+                               int(radius/2), 0)
 
-        pix_array = pygame.surfarray.pixels_red(circ_surface)
-        start = e.pos
-        dx = end[0]-start[0]
-        dy = end[1]-start[1]
-        distance = max(abs(dx), abs(dy))
+            """WORK IN PROGRESS ON MAKING DRAWN COURSES DIRECTIONAL"""
+            order_surface = pygame.Surface((radius, radius))
+            order_surface.fill((0, 0, 0))
+            pygame.draw.circle(order_surface, (255, 255, 255), (int(radius/2),
+                                                                int(radius/2)),
+                               int(radius/2), 0)
 
-        offset = int(radius/2)
-        for i in range(distance):
-            x = int(start[0]+float(i)/distance*dx)
-            y = int(start[1]+float(i)/distance*dy)
+            pix_array = pygame.surfarray.pixels_red(circ_surface)
+            start = e.pos
+            dx = end[0]-start[0]
+            dy = end[1]-start[1]
+            distance = max(abs(dx), abs(dy))
 
-            left_val = max(0, x-offset)
-            right_val = min(world.road.shape[0], x+offset)
+            offset = int(radius/2)
+            for i in range(distance):
+                x = int(start[0]+float(i)/distance*dx)
+                y = int(start[1]+float(i)/distance*dy)
 
-            top_val = max(0, y-offset)
-            bottom_val = min(world.road.shape[1], y+offset)
+                left_val = max(0, x-offset)
+                right_val = min(world.road.shape[0], x+offset)
 
-            width = right_val - left_val
-            height = bottom_val - top_val
-            world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
+                top_val = max(0, y-offset)
+                bottom_val = min(world.road.shape[1], y+offset)
 
+                width = right_val - left_val
+                height = bottom_val - top_val
+                world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
 
-            pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
+                # map(add, world.order_map, latest_o)
 
+                pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
 
-        world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
+                world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
 
 
 if __name__ == "__main__":
