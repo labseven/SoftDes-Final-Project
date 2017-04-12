@@ -5,12 +5,9 @@ The View class.
 
 import pygame
 import Buttons
-from pygame.surfarray import blit_array
 import numpy as np
-from math import cos
 from random import randint
 from collections import namedtuple
-from operator import add
 
 Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
@@ -33,25 +30,22 @@ class View():
         self.road_mask = self.get_road_surface(self.world.road)
 
         self.Button1 = Buttons.Button()
-
-        self.draw_mode = False
-        self.click_catch = True
+        self.ready_to_draw = False
 
     def build_obj_canvas(self):
         # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
-        corn_surf = pygame.image.load("assets/corn.png") # Load corn image
-        barn_surf = pygame.image.load("assets/barn.png") # Load barn image
+        corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
+        barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
 
         all_objs = [Sprite(barn_surf, 500, 500)]
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
-                        for x in range(5000)] if self.world.road[obj.x, obj.y] == 0
+                        for x in range(100)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
-                        -50 <= obj.y-all_objs[0].y <= 50)])
+                                 -50 <= obj.y-all_objs[0].y <= 50)])
         obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
 
         return obj_surfaces
-
 
     def draw_scene(self, world, events):
         """
@@ -66,11 +60,17 @@ class View():
                 raise StopIteration
             if e.type == pygame.MOUSEBUTTONDOWN:
                 self.roundline(world, color, e, e.pos,  radius)
-                self.draw_on = True
-
+                if self.ready_to_draw:
+                    self.ready_to_draw = False
+                    self.draw_on = True
             if e.type == pygame.MOUSEBUTTONUP:
-
                 self.objs = self.build_obj_canvas()
+                x, y = e.pos
+                if x > 690 and x < 990 and y > 10 and y < 60:
+                    self.draw_on = False
+                    self.ready_to_draw = True
+                else:
+                    self.draw_on = False
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
                     self.roundline(world, color, e, self.last_pos,  radius)
@@ -142,49 +142,47 @@ class View():
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size)
                     self.road_mask = self.get_road_surface(self.world.road)
-                    self.draw_mode = True
 
     def roundline(self, world, color, e, end, radius):
-        if self.draw_mode:
-            circ_surface = pygame.Surface((radius, radius))
-            circ_surface.fill((0, 0, 0))
-            pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2),
-                                                               int(radius/2)),
-                               int(radius/2), 0)
+        circ_surface = pygame.Surface((radius, radius))
+        circ_surface.fill((0, 0, 0))
+        pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2),
+                                                           int(radius/2)),
+                           int(radius/2), 0)
 
-            """WORK IN PROGRESS ON MAKING DRAWN COURSES DIRECTIONAL"""
-            order_surface = pygame.Surface((radius, radius))
-            order_surface.fill((0, 0, 0))
-            pygame.draw.circle(order_surface, (255, 255, 255), (int(radius/2),
-                                                                int(radius/2)),
-                               int(radius/2), 0)
+        """WORK IN PROGRESS ON MAKING DRAWN COURSES DIRECTIONAL"""
+        order_surface = pygame.Surface((radius, radius))
+        order_surface.fill((0, 0, 0))
+        pygame.draw.circle(order_surface, (255, 255, 255), (int(radius/2),
+                                                            int(radius/2)),
+                           int(radius/2), 0)
 
-            pix_array = pygame.surfarray.pixels_red(circ_surface)
-            start = e.pos
-            dx = end[0]-start[0]
-            dy = end[1]-start[1]
-            distance = max(abs(dx), abs(dy))
+        pix_array = pygame.surfarray.pixels_red(circ_surface)
+        start = e.pos
+        dx = end[0]-start[0]
+        dy = end[1]-start[1]
+        distance = max(abs(dx), abs(dy))
 
-            offset = int(radius/2)
-            for i in range(distance):
-                x = int(start[0]+float(i)/distance*dx)
-                y = int(start[1]+float(i)/distance*dy)
+        offset = int(radius/2)
+        for i in range(distance):
+            x = int(start[0]+float(i)/distance*dx)
+            y = int(start[1]+float(i)/distance*dy)
 
-                left_val = max(0, x-offset)
-                right_val = min(world.road.shape[0], x+offset)
+            left_val = max(0, x-offset)
+            right_val = min(world.road.shape[0], x+offset)
 
-                top_val = max(0, y-offset)
-                bottom_val = min(world.road.shape[1], y+offset)
+            top_val = max(0, y-offset)
+            bottom_val = min(world.road.shape[1], y+offset)
 
-                width = right_val - left_val
-                height = bottom_val - top_val
-                world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
+            width = right_val - left_val
+            height = bottom_val - top_val
+            world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
 
-                # map(add, world.order_map, latest_o)
+            # map(add, world.order_map, latest_o)
 
-                pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
+            pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
 
-                world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
+            world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
 
 
 if __name__ == "__main__":

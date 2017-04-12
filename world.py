@@ -42,3 +42,6 @@ class World():
                 if self.order_map[r][c] > 0:
                     self.order_map[r][c] = 1
         print(self.order_map)
+
+    def sum_order(self, map_addition):
+        pass
