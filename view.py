@@ -32,6 +32,15 @@ class View():
         self.Button1 = Buttons.Button()
         self.ready_to_draw = False
 
+        self.order_array_size = 100
+        self.order_array = []
+        for h in range(self.order_array_size):
+            row = []
+            for w in range(self.order_array_size):
+                row.append(-10)
+            self.order_array.append(row)
+        self.desirability = 0
+
     def build_obj_canvas(self):
         # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
@@ -144,17 +153,11 @@ class View():
                     self.road_mask = self.get_road_surface(self.world.road)
 
     def roundline(self, world, color, e, end, radius):
+        self.desirability += .1
         circ_surface = pygame.Surface((radius, radius))
         circ_surface.fill((0, 0, 0))
         pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2),
                                                            int(radius/2)),
-                           int(radius/2), 0)
-
-        """WORK IN PROGRESS ON MAKING DRAWN COURSES DIRECTIONAL"""
-        order_surface = pygame.Surface((radius, radius))
-        order_surface.fill((0, 0, 0))
-        pygame.draw.circle(order_surface, (255, 255, 255), (int(radius/2),
-                                                            int(radius/2)),
                            int(radius/2), 0)
 
         pix_array = pygame.surfarray.pixels_red(circ_surface)
@@ -164,7 +167,9 @@ class View():
         distance = max(abs(dx), abs(dy))
 
         offset = int(radius/2)
+
         for i in range(distance):
+
             x = int(start[0]+float(i)/distance*dx)
             y = int(start[1]+float(i)/distance*dy)
 
@@ -178,11 +183,17 @@ class View():
             height = bottom_val - top_val
             world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
 
-            # map(add, world.order_map, latest_o)
+            pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y),
+                               int(radius/2), 0)
 
-            pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
+            x_int = (int)(x / 10)
+            y_int = (int)(y / 10)
+            num = self.order_array[y_int][x_int]
+            if num < 0:
+                self.order_array[y_int][x_int] = self.desirability
 
-            world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
+        print(self.order_array, end='\r')
+        world.road[world.road > 0] = 255  # This fixes weird LIDAR issues
 
 
 if __name__ == "__main__":

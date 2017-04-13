@@ -30,7 +30,7 @@ class World():
 
         self.world_map = World_Map(size)
         self.road = misc.imread('assets/track.png', mode='L')
-        self.car = Car(self.road, size, [500, 500], [0, 1], [0.1, 0],
+        self.car = Car(self.road, size, [200, 500], [0, 1], [0.1, 0],
                        car_color=(randint(0, 255),
                                   randint(0, 255),
                                   randint(0, 255)))
@@ -44,4 +44,4 @@ class World():
         print(self.order_map)
 
     def sum_order(self, map_addition):
-        pass
+        print(map_addition.shape)

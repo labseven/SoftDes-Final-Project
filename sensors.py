@@ -67,12 +67,15 @@ class Sensors():
         # Ray goes until the map changes values
         try:
             curr_map_value = self.road[mapX][mapY]
-            print(curr_map_value, end="\r")
+            # print(curr_map_value, end="\r")
         except:
             # If off the screen
             # print("Off the screen")
             curr_map_value = 0
 
+        if curr_map_value == 0:
+            print("LOL BICH U DEDDDDDDDD", end='\r')
+            # raise StopIteration
         ray_angle = angle + self.car.angle[0]
 
         dirX = sin(ray_angle)
