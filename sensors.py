@@ -26,9 +26,6 @@ class Sensors():
         for i in range(lidar_num):
             self.lidar_angles.append(lidar_max_angle + (i * lidar_spacing))
 
-    def update_road(self, road):
-        self.road = road
-
     def get_lidar_data(self, lidar_angles=None):
         """ Outputs a list of lidar distances.
         """
@@ -43,6 +40,7 @@ class Sensors():
             hit_pos.append(lidar[1])
 
         return distances, hit_pos
+
 
     def get_lidar_distance(self, angle, return_square_dist=False):
         """ Return the distance from car to the nearest wall, in the direction
@@ -67,15 +65,12 @@ class Sensors():
         # Ray goes until the map changes values
         try:
             curr_map_value = self.road[mapX][mapY]
-            # print(curr_map_value, end="\r")
+            # print(curr_map_value)
         except:
             # If off the screen
             # print("Off the screen")
             curr_map_value = 0
 
-        if curr_map_value == 0:
-            print("LOL BICH U DEDDDDDDDD", end='\r')
-            # raise StopIteration
         ray_angle = angle + self.car.angle[0]
 
         dirX = sin(ray_angle)
