@@ -2,10 +2,8 @@ from world import World
 from view import View
 import pygame
 from math import pi
-import sys
-
-FORCE = -1000
-BRAKING = -1500
+FORCE = -500
+BRAKING = -1000
 INCREMENT = pi / 10
 steering_max = pi/2-.1
 
@@ -24,7 +22,7 @@ def main():
         # The list is for keys [W, S, A, D]
         events = get_events()
         keys_pressed = get_input()
-        # mouse_down = get_mouse_drawing(events)
+        mouse_down = get_mouse_drawing(events)
 
         world.car.driving_force = (keys_pressed[0] * FORCE - keys_pressed[1] * BRAKING)
         world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
@@ -33,8 +31,9 @@ def main():
         elif world.car.steering < -steering_max:
             world.car.steering = -steering_max
 
+
         view.draw_scene(world, events)
-        world.car.update_pos(world.road)
+        world.car.update_pos()
 
         view.press_button(events)
 

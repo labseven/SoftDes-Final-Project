@@ -18,15 +18,13 @@ class Car():
         self.accelerometer = 0
         self.size = (4, 8)
 
-        self.sensors = Sensors(self, road, world_size)
-
         self.color = car_color
+        self.sensors = Sensors(self, road, world_size)
         self.lidar_distances = []
         self.lidar_hits = []
 
-    def update_pos(self, road):
+    def update_pos(self):
         # F_net and T_net are inputs from keyboard or autonomous
-        self.sensors.update_road(road)
         delta_time = .09
 
         [self.position,
