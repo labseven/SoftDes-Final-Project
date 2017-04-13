@@ -71,6 +71,10 @@ class Sensors():
             # print("Off the screen")
             curr_map_value = 0
 
+        if curr_map_value == 0:
+            # print("Crashed", end='\r')
+            # raise StopIteration
+
         ray_angle = angle + self.car.angle[0]
 
         dirX = sin(ray_angle)

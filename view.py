@@ -72,9 +72,10 @@ class View():
                     self.roundline(world, color, e, self.last_pos,  radius)
                 self.last_pos = e.pos
 
+
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        self.screen.blit(self.objs, (0, 0))
         self.draw_car(world.car)
+        self.screen.blit(self.objs, (0, 0))
 
         pygame.display.flip()
 

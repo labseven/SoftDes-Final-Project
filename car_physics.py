@@ -27,7 +27,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
         beta -> angle between velocity and car in RADIANS
     """
     L = 4  # Wheelbase in meters
-
+    minimum_speed = 5  # Minimum Creep speed, in m/s
     # a is distance from front wheel to center of gravity
     # b is distance from rear wheel
     a = 1/4
@@ -67,9 +67,17 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     # Case that catches the acos innaccuracies in the third and fourth quads.
     if velocity[0] > 0:
         beta = 2*math.pi - beta
+
+    if speed < minimum_speed:
+        velocity[0] = -minimum_speed * car_vector[0]
+        velocity[1] = -minimum_speed * car_vector[1]
+        steering = -steering
+        # beta = 0
+        # print(velocity[0], velocity[1])
+
     # speedometer print statement
-    speed_mph = (int)(2.23694 * speed * 100) / 100
-    print(speed_mph, 'mph', end="\r")
+    # speed_mph = (int)(2.23694 * speed * 100) / 100
+    # print(speed_mph, 'mph', end="\r")
 
     # Defines the difference between car's orientation and direction of travel
     angle_sep = theta - beta
