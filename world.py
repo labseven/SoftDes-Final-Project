@@ -3,7 +3,7 @@ World:
 Holds the map.
 """
 from car import Car
-import scipy.ndimage as misc
+# import scipy.ndimage as misc
 from random import randint
 import copy
 
@@ -16,21 +16,19 @@ class World_Map():
         self.world_map = np.zeros(size)
         self.world_map_size = size
         # Quick wall for testing
-        for i in range(size[0]):
-            self.world_map[i][i] = 1
-        print(self.world_map)
         print("Made world_map")
 
 
 class World():
-    def __init__(self, size):
+    def __init__(self, size=(1000, 1000)):
         """
         Initializes the numpy matrix for the road and creates a car.
         """
 
-        self.world_map = World_Map(size)
+        # self.road = World_Map(size)
+        self.road = np.zeros(size)
+        self.track_points = []
         # self.road = misc.imread('assets/track.png', mode='L')
-        self.road = np.zeros((1000, 1000))
         self.car = Car(self.road, size, [200, 500], [0, 1], [0.1, 0],
                        car_color=(randint(0, 255),
                                   randint(0, 255),
@@ -45,17 +43,15 @@ class World():
             for r in range(h):
                 if self.order_map[r][c] > 0:
                     self.order_map[r][c] = 1
-        print(self.order_map)
 
-    def sum_order(self, map_addition):
-        print(map_addition.shape)
+        self.checkpoints = []
 
     def detect_crash(self):
         """
         Returns True if the car has crashed, False otherwise
         """
-        car_pos = self.car.position
-        return self.road[int(car_pos[0]), int(car_pos[1])] == 0
+        hit_points = [self.road[pos] == 0 for pos in self.car.points]
+        return any(hit_points)
 
     def reset_car(self):
         """
@@ -64,3 +60,8 @@ class World():
         self.car.position = self.car_start_pos  # Set the car at the starting point
         self.car.angle = [self.car_start_angle, 0]  # Set the car at the starting heading
         self.car.velocity = [0, 0]  # Stop the car
+
+    def update_checkpoints(self, num_checkpoints=3):
+        track_points_len = len(self.track_points)
+        checkpoint_indices = [int(track_points_len/(num_checkpoints+1)*val) for val in range(1, num_checkpoints+1)]
+        self.checkpoints = [self.track_points[idx] for idx in checkpoint_indices]

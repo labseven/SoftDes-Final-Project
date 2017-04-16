@@ -9,7 +9,6 @@ import numpy as np
 from random import randint
 from collections import namedtuple
 import math
-import time
 
 Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
@@ -26,7 +25,6 @@ class View():
         self.world = map_in
         self.screen = pygame.display.set_mode(size)
         self.draw_on = False
-        self.last_pos = (0, 0)
         self.objs = self.build_obj_canvas()
         self.road_mask = self.get_road_surface(self.world.road)
 
@@ -71,11 +69,17 @@ class View():
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
         if world.car.visible:
             self.draw_car(world.car)  # Draw on car
+            for checkpoint in world.checkpoints:
+                pygame.draw.rect(self.screen, (255, 255, 255), (checkpoint[0], checkpoint[1], 10, 10), 0)
         self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
 
     def process_draw_events(self, world, events, radius, color):
+        """
+        Handles mouse events to decide whether to draw a new track or not, as well as
+        car position resetting
+        """
         for e in events:  # Iterate through all mouse events
             if e.type == pygame.MOUSEBUTTONDOWN:
                 if self.ready_to_draw:  # Mouse is pressed and ready to draw
@@ -83,7 +87,7 @@ class View():
                     self.ready_to_draw = False
                     self.draw_on = True
 
-                    self.track_points = [e.pos]
+                    world.track_points = [e.pos]
 
             if e.type == pygame.MOUSEBUTTONUP:
                 x, y = e.pos
@@ -95,15 +99,15 @@ class View():
                 elif self.draw_on:  # If the mouse was lifted up after drawing
                     self.draw_on = False
                     self.objs = self.build_obj_canvas()
-                    world.car_start_angle = get_start_angle(self.track_points)
+                    world.car_start_angle = get_start_angle(world.track_points)
                     world.reset_car()  # Reset the car, the track has been re-drawn
                     world.car.visible = True
+                    world.update_checkpoints()
 
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
-                    self.track_points.append(e.pos)
-                    self.roundline(world, color, self.track_points[-1], self.track_points[-2],  radius)  # Draw us some lines
-                self.last_pos = e.pos
+                    world.track_points.append(e.pos)
+                    self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
 
     def get_road_surface(self, road):
@@ -136,8 +140,11 @@ class View():
         new_rect = rot_car.get_rect(center=car_rect.center)  # Needed to keep car in same place
         new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
 
+        car.points = [new_rect.topleft, new_rect.topright, new_rect.bottomright, new_rect.bottomleft]
+
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
+
 
     def draw_lidar(self, car):
         """
