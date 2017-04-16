@@ -69,7 +69,8 @@ class View():
 
         self.process_draw_events(world, events, radius, color)  # Handle drawing stuff
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        self.draw_car(world.car)  # Draw on car
+        if world.car.visible:
+            self.draw_car(world.car)  # Draw on car
         self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
@@ -89,11 +90,14 @@ class View():
                 if x > 690 and x < 990 and y > 10 and y < 60:  # If button is pressed and released
                     self.draw_on = False  # Make sure we already aren't drawing
                     self.ready_to_draw = True  # Make it possible to draw
+                    world.car.visible = False  # Stop drawing the car temporarily
+
                 elif self.draw_on:  # If the mouse was lifted up after drawing
                     self.draw_on = False
                     self.objs = self.build_obj_canvas()
                     world.car_start_angle = get_start_angle(self.track_points)
                     world.reset_car()  # Reset the car, the track has been re-drawn
+                    world.car.visible = True
 
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
@@ -119,15 +123,17 @@ class View():
         Draws the car onto the frame.
         """
 
-        x_pos, y_pos = car.position
+        x_pos, y_pos = car.position  # Get car position, angle
         theta = -car.angle[0]
 
-        car_sprite = pygame.image.load("assets/car.png")
+        car_sprite = pygame.image.load("assets/car.png")  # Load car sprite
+        # Scale the car sprite to be the correct size
         car_sprite = pygame.transform.scale(car_sprite, (car.sprite_w, car.sprite_h))
-        car_rect = car_sprite.get_rect()
+        car_rect = car_sprite.get_rect()  # Get rect for car
 
+        # Rotate the car sprite in place
         rot_car = pygame.transform.rotate(car_sprite, 180-theta*(180/3.1416))
-        new_rect = rot_car.get_rect(center=car_rect.center)
+        new_rect = rot_car.get_rect(center=car_rect.center)  # Needed to keep car in same place
         new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
 
         self.draw_lidar(car)

@@ -29,7 +29,8 @@ class World():
         """
 
         self.world_map = World_Map(size)
-        self.road = misc.imread('assets/track.png', mode='L')
+        # self.road = misc.imread('assets/track.png', mode='L')
+        self.road = np.zeros((1000, 1000))
         self.car = Car(self.road, size, [200, 500], [0, 1], [0.1, 0],
                        car_color=(randint(0, 255),
                                   randint(0, 255),

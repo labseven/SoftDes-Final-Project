@@ -26,6 +26,8 @@ class Car():
         self.sprite_w = 16
         self.sprite_h = 32
 
+        self.visible = False
+
     def update_pos(self, road):
         # F_net and T_net are inputs from keyboard or autonomous
         self.sensors.update_road(road)
