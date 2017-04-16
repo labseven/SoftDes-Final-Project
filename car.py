@@ -23,6 +23,8 @@ class Car():
         self.color = car_color
         self.lidar_distances = []
         self.lidar_hits = []
+        self.sprite_w = 16
+        self.sprite_h = 32
 
     def update_pos(self, road):
         # F_net and T_net are inputs from keyboard or autonomous

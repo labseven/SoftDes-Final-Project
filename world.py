@@ -35,6 +35,9 @@ class World():
                                   randint(0, 255),
                                   randint(0, 255)))
 
+        self.car_start_pos = (500, 500)
+        self.car_start_angle = 0
+
         self.order_map = copy.copy(self.road)
         w, h = size
         for c in range(w):
@@ -45,3 +48,19 @@ class World():
 
     def sum_order(self, map_addition):
         print(map_addition.shape)
+
+    def detect_crash(self):
+        """
+        Returns True if the car has crashed, False otherwise
+        """
+        car_pos = self.car.position
+        print(car_pos)
+        return self.road[int(car_pos[0]), (car_pos[1])] == 0
+
+    def reset_car(self):
+        """
+        Resets the position, angle, and velocity of the car.
+        """
+        self.car.position = self.car_start_pos  # Set the car at the starting point
+        self.car.angle = [self.car_start_angle, 0]  # Set the car at the starting heading
+        self.car.velocity = [0, 0]  # Stop the car

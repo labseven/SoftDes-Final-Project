@@ -38,6 +38,9 @@ def main():
 
         view.press_button(events)
 
+        if world.detect_crash():
+            world.reset_car()
+
         clock.tick(60)
 
 

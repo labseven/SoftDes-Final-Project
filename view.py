@@ -8,16 +8,17 @@ import Buttons
 import numpy as np
 from random import randint
 from collections import namedtuple
+import math
+import time
 
 Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
 BG_COLOR = (70, 204, 63)
-sprite_width = 16
-sprite_height = 32
 
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
+        self.track_points = []  # List of mouse points on track
         self.bg_color = (70, 204, 63)
 
         self.size = size
@@ -40,6 +41,7 @@ class View():
                 row.append(-10)
             self.order_array.append(row)
         self.desirability = 0
+
 
     def build_obj_canvas(self):
         # Build transparent surface
@@ -64,32 +66,41 @@ class View():
 
         radius = 100
         color = (255, 255, 255)
-        for e in events:
-            if e.type == pygame.QUIT:
-                raise StopIteration
+
+        self.process_draw_events(world, events, radius, color)  # Handle drawing stuff
+        self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
+        self.draw_car(world.car)  # Draw on car
+        self.screen.blit(self.objs, (0, 0))
+        self.draw_buttons()
+        pygame.display.flip()
+
+    def process_draw_events(self, world, events, radius, color):
+        for e in events:  # Iterate through all mouse events
             if e.type == pygame.MOUSEBUTTONDOWN:
-                self.roundline(world, color, e, e.pos,  radius)
-                if self.ready_to_draw:
+                if self.ready_to_draw:  # Mouse is pressed and ready to draw
+                    world.car_start_pos = (e.pos[0]-world.car.sprite_w/2, e.pos[1]-world.car.sprite_h/2)  # Define new car starting point
                     self.ready_to_draw = False
                     self.draw_on = True
+
+                    self.track_points = [e.pos]
+
             if e.type == pygame.MOUSEBUTTONUP:
-                self.objs = self.build_obj_canvas()
                 x, y = e.pos
-                if x > 690 and x < 990 and y > 10 and y < 60:
+                if x > 690 and x < 990 and y > 10 and y < 60:  # If button is pressed and released
+                    self.draw_on = False  # Make sure we already aren't drawing
+                    self.ready_to_draw = True  # Make it possible to draw
+                elif self.draw_on:  # If the mouse was lifted up after drawing
                     self.draw_on = False
-                    self.ready_to_draw = True
-                else:
-                    self.draw_on = False
+                    self.objs = self.build_obj_canvas()
+                    world.car_start_angle = get_start_angle(self.track_points)
+                    world.reset_car()  # Reset the car, the track has been re-drawn
+
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
-                    self.roundline(world, color, e, self.last_pos,  radius)
+                    self.track_points.append(e.pos)
+                    self.roundline(world, color, self.track_points[-1], self.track_points[-2],  radius)  # Draw us some lines
                 self.last_pos = e.pos
 
-        self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        self.screen.blit(self.objs, (0, 0))
-        self.draw_car(world.car)
-
-        pygame.display.flip()
 
     def get_road_surface(self, road):
         """
@@ -112,7 +123,7 @@ class View():
         theta = -car.angle[0]
 
         car_sprite = pygame.image.load("assets/car.png")
-        car_sprite = pygame.transform.scale(car_sprite, (sprite_width, sprite_height))
+        car_sprite = pygame.transform.scale(car_sprite, (car.sprite_w, car.sprite_h))
         car_rect = car_sprite.get_rect()
 
         rot_car = pygame.transform.rotate(car_sprite, 180-theta*(180/3.1416))
@@ -121,14 +132,13 @@ class View():
 
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
-        self.draw_buttons()
 
     def draw_lidar(self, car):
         """
         Draws lidar beams.
         """
         for hit in car.lidar_hits:
-            pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+sprite_width/2, car.position[1]+sprite_height/2), hit)
+            pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), hit)
 
     def draw_decorations(self, objects, screen):
         """
@@ -152,7 +162,7 @@ class View():
                     self.world.road = np.zeros(self.size)
                     self.road_mask = self.get_road_surface(self.world.road)
 
-    def roundline(self, world, color, e, end, radius):
+    def roundline(self, world, color, start, end, radius):
         self.desirability += .1
         circ_surface = pygame.Surface((radius, radius))
         circ_surface.fill((0, 0, 0))
@@ -161,7 +171,6 @@ class View():
                            int(radius/2), 0)
 
         pix_array = pygame.surfarray.pixels_red(circ_surface)
-        start = e.pos
         dx = end[0]-start[0]
         dy = end[1]-start[1]
         distance = max(abs(dx), abs(dy))
@@ -192,8 +201,23 @@ class View():
             if num < 0:
                 self.order_array[y_int][x_int] = self.desirability
 
-        print(self.order_array, end='\r')
+        # print(self.order_array, end='\r')
         world.road[world.road > 0] = 255  # This fixes weird LIDAR issues
+
+
+def get_start_angle(pos_list):
+    """
+    Takes in a list of mouse positions when drawing the track, and returns a reasonable approximation of the starting
+    angle based on the line between the first and fourth points.
+    """
+    pos_init = pos_list[0]  # Initial position
+    try:
+        pos_final = pos_list[3]
+    except IndexError:
+        pos_final = pos_list[-1]  # Avoid index out of bounds errors
+
+    mouse_vel = (pos_final[0] - pos_init[0], pos_init[1] - pos_final[1])  # Flipped Y values because of display/matrix difference
+    return math.atan2(mouse_vel[1], mouse_vel[0])-(math.pi/2)
 
 
 if __name__ == "__main__":
