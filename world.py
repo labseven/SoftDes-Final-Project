@@ -54,8 +54,7 @@ class World():
         Returns True if the car has crashed, False otherwise
         """
         car_pos = self.car.position
-        print(car_pos)
-        return self.road[int(car_pos[0]), (car_pos[1])] == 0
+        return self.road[int(car_pos[0]), int(car_pos[1])] == 0
 
     def reset_car(self):
         """
