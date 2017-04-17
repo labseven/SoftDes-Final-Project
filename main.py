@@ -49,13 +49,19 @@ def main():
 
         view.press_button(events)
 
+        if world.detect_crash():  # If the car has crashed, reset it
+            world.reset_car()
+
         clock.tick(60)
 
 
 def get_events():
+    """
+    Handles getting Pygame events.
+    """
     events = pygame.event.get()
     for e in events:
-        if e.type == pygame.QUIT:
+        if e.type == pygame.QUIT:  # If a quit event is received, exit
             pygame.quit()
     return events
 
@@ -66,7 +72,9 @@ def get_input():
     """
     keys = pygame.key.get_pressed()
     keys_down = [idx for idx, val in enumerate(keys) if val == 1]
+    # The event values representing the keys pressed
     event_keys = (pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a)
+    # Convert the list of pressed keys to a list of each relevant key's state
     key_states = [int(key in keys_down) for key in event_keys]
     return key_states
 
