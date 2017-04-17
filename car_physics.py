@@ -67,6 +67,15 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     # Case that catches the acos innaccuracies in the third and fourth quads.
     if velocity[0] > 0:
         beta = 2*math.pi - beta
+
+    if speed < 5:
+        base_speed = 5  # m/s
+        velocity[0] = -base_speed * car_vector[0]
+        velocity[1] = -base_speed * car_vector[1]
+        steering = -steering
+        # beta = 0
+        # print(velocity[0], velocity[1])
+
     # speedometer print statement
     speed_mph = (int)(2.23694 * speed * 100) / 100
     print(speed_mph, 'mph', end="\r")
