@@ -2,10 +2,8 @@ from world import World
 from view import View
 import pygame
 from math import pi
-import sys
-
-FORCE = -1000
-BRAKING = -1500
+FORCE = -500
+BRAKING = -1000
 INCREMENT = pi / 10
 steering_max = pi/2-.1
 
@@ -18,13 +16,25 @@ def main():
 
     clock = pygame.time.Clock()
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
+    start = True
+
+    while start:
+        events = get_events()
+
+        keys = pygame.key.get_pressed()
+        keys_down = [idx for idx, val in enumerate(keys) if val == 1]
+        event_keys = (pygame.K_SPACE, 0)
+        key_states = [int(key in keys_down) for key in event_keys]
+        if key_states[0] is 1:
+            start = False
+
+        view.draw_start(size)
 
     while True:
         # This block of code generates a list of each key's pressed status (0=up, 1=pressed)
         # The list is for keys [W, S, A, D]
         events = get_events()
         keys_pressed = get_input()
-        # mouse_down = get_mouse_drawing(events)
 
         world.car.driving_force = (keys_pressed[0] * FORCE - keys_pressed[1] * BRAKING)
         world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
@@ -33,6 +43,7 @@ def main():
         elif world.car.steering < -steering_max:
             world.car.steering = -steering_max
 
+        # draws the map, car and button
         view.draw_scene(world, events)
         world.car.update_pos(world.road)
 
@@ -45,11 +56,13 @@ def main():
 
 
 def get_events():
+    """
+    Handles getting Pygame events.
+    """
     events = pygame.event.get()
     for e in events:
-        if e.type == pygame.QUIT:
+        if e.type == pygame.QUIT:  # If a quit event is received, exit
             pygame.quit()
-            sys.exit()
     return events
 
 
@@ -59,7 +72,9 @@ def get_input():
     """
     keys = pygame.key.get_pressed()
     keys_down = [idx for idx, val in enumerate(keys) if val == 1]
+    # The event values representing the keys pressed
     event_keys = (pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a)
+    # Convert the list of pressed keys to a list of each relevant key's state
     key_states = [int(key in keys_down) for key in event_keys]
     return key_states
 

@@ -22,6 +22,7 @@ class Car():
 
         # Drawing things
         self.color = car_color
+        self.sensors = Sensors(self, road, world_size)
         self.lidar_distances = []
         self.lidar_hits = []
         self.sprite_w = 16

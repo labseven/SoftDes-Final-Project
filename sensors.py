@@ -44,6 +44,7 @@ class Sensors():
 
         return distances, hit_pos
 
+
     def get_lidar_distance(self, angle, return_square_dist=False):
         """ Return the distance from car to the nearest wall, in the direction
         of angle. Also returns coordinates of lidar hit.
@@ -67,15 +68,16 @@ class Sensors():
         # Ray goes until the map changes values
         try:
             curr_map_value = self.road[mapX][mapY]
-            # print(curr_map_value, end="\r")
+            # print(curr_map_value)
         except:
             # If off the screen
             # print("Off the screen")
             curr_map_value = 0
 
         if curr_map_value == 0:
-            print("LOL BICH U DEDDDDDDDD", end='\r')
+            # print("Crashed", end='\r')
             # raise StopIteration
+            pass
         ray_angle = angle + self.car.angle[0]
 
         dirX = sin(ray_angle)

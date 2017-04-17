@@ -14,6 +14,11 @@ Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
 BG_COLOR = (70, 204, 63)
 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+YELLOW = (255, 233, 0)
+RED = (203, 20, 16)
+
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
@@ -40,18 +45,17 @@ class View():
             self.order_array.append(row)
         self.desirability = 0
 
-
-    def build_obj_canvas(self):
+    def build_obj_canvas(self, barn_pos=(500, 500), num_corn=100):
         # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
         barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
 
-        all_objs = [Sprite(barn_surf, 500, 500)]
+        all_objs = [Sprite(barn_surf, barn_pos[0], barn_pos[1])]  # Barn object
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
-                        for x in range(100)] if self.world.road[obj.x, obj.y] == 0
+                        for x in range(num_corn)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
-                                 -50 <= obj.y-all_objs[0].y <= 50)])
+                        -50 <= obj.y-all_objs[0].y <= 50)])
         obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
 
         return obj_surfaces
@@ -163,59 +167,103 @@ class View():
         return screen
 
     def draw_buttons(self):
+        # creates new button on top right corner of screen
         #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
+        # defines what happens when button is pressed
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
-                    self.world.road = np.zeros(self.size)
-                    self.road_mask = self.get_road_surface(self.world.road)
+                    self.world.road = np.zeros(self.size) #when pressed, contents of road matrix is cleared, aka set to 0
+                    self.road_mask = self.get_road_surface(self.world.road) #rerenders the road picture on the screen so it is clear fo road
 
     def roundline(self, world, color, start, end, radius):
         self.desirability += .1
+        """
+        Draws a round line from one point to another and updates the road matrix
+        """
         circ_surface = pygame.Surface((radius, radius))
         circ_surface.fill((0, 0, 0))
-        pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2),
-                                                           int(radius/2)),
-                           int(radius/2), 0)
-
+        # Builds the stencil for drawing the road
+        pygame.draw.circle(circ_surface, (255, 255, 255), (int(radius/2), int(radius/2)), int(radius/2), 0)
+        # Converts the stencil to a matrix that is usable
         pix_array = pygame.surfarray.pixels_red(circ_surface)
         dx = end[0]-start[0]
         dy = end[1]-start[1]
         distance = max(abs(dx), abs(dy))
-
-        offset = int(radius/2)
-
-        for i in range(distance):
-
-            x = int(start[0]+float(i)/distance*dx)
+        offset = int(radius/2)  # Offset so the drawing is centered around the cursor
+        for i in range(distance):  # loop through the line
+            x = int(start[0]+float(i)/distance*dx)  # Current position where we're drawing
             y = int(start[1]+float(i)/distance*dy)
 
+            # Get limits of where we're drawing the circle
             left_val = max(0, x-offset)
             right_val = min(world.road.shape[0], x+offset)
-
             top_val = max(0, y-offset)
             bottom_val = min(world.road.shape[1], y+offset)
 
+            # Updates the road matrix to reflect new drawing
             width = right_val - left_val
             height = bottom_val - top_val
             world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
-
-            pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y),
-                               int(radius/2), 0)
-
             x_int = (int)(x / 10)
             y_int = (int)(y / 10)
             num = self.order_array[y_int][x_int]
             if num < 0:
                 self.order_array[y_int][x_int] = self.desirability
+            # Draws the circle on the surface of the road
+            pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
 
-        # print(self.order_array, end='\r')
-        world.road[world.road > 0] = 255  # This fixes weird LIDAR issues
+        world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
+
+    def text_objects(self, text, font, color):
+        textSurface = font.render(text, True, color)
+        return textSurface, textSurface.get_rect()
+
+    def draw_start(self, size):
+        screen1 = pygame.display.set_mode(size)
+        screen1.fill(WHITE)
+        pygame.font.init()
+        myfont = pygame.font.Font('freesansbold.ttf', 30)
+        mymedfont = pygame.font.Font('freesansbold.ttf', 40)
+        mylargefont = pygame.font.Font('freesansbold.ttf', 50)
+
+        corn_surf = pygame.image.load("assets/corn.png")
+
+        TextSurf, TextRect = self.text_objects('Corn', mylargefont, YELLOW)
+        TextSurfH, TextRectH = self.text_objects('HELL', mylargefont, RED)
+        TextSurf1, TextRect1 = self.text_objects('Can you survive the', myfont, YELLOW)
+        TextSurf2, TextRect2 = self.text_objects('craziest track of all time...', myfont, YELLOW)
+        TextSurf3, TextRect3 = self.text_objects('Only you decide!', mymedfont, YELLOW)
+        TextSurf4, TextRect4 = self.text_objects('Create your hell now!', mylargefont, YELLOW)
+        TextSurf5, TextRect5 = self.text_objects('Press Space Bar to Start', myfont, YELLOW)
+
+        TextRect.center = ((size[0]/2 - 75), (size[1]/4))
+        TextRectH.center = ((size[0]/2 + 75), (size[1]/4))
+        TextRect1.center = ((size[0]/2), (size[1]/2 - 200))
+        TextRect2.center = ((size[0]/2), (size[1]/2 - 150))
+        TextRect3.center = ((size[0]/2), (size[1]/2 - 100))
+        TextRect4.center = ((size[0]/2), (size[1]/2))
+        TextRect5.center = ((size[0]/2), (size[1]/4 * 3))
+
+        screen1.blit(TextSurf, TextRect)
+        screen1.blit(TextSurfH, TextRectH)
+        screen1.blit(TextSurf1, TextRect1)
+        screen1.blit(TextSurf2, TextRect2)
+        screen1.blit(TextSurf3, TextRect3)
+        screen1.blit(TextSurf4, TextRect4)
+        screen1.blit(TextSurf5, TextRect5)
+
+        screen1.blit(corn_surf, (50, 50))
+        screen1.blit(corn_surf, (50, size[1]-100))
+        screen1.blit(corn_surf, (size[0]-100, 50))
+        screen1.blit(corn_surf, (size[0]-100, size[1]-100))
+
+        pygame.display.update()
 
 
 def get_start_angle(pos_list):
