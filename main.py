@@ -8,6 +8,7 @@ INCREMENT = pi / 10
 steering_max = pi/2-.1
 
 
+
 def main():
     size = (1000, 1000)
     world = World(size)
@@ -16,6 +17,18 @@ def main():
 
     clock = pygame.time.Clock()
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
+    start = True
+
+
+    while start:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                start = False
+                pygame.quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                start = False
+
+        view.draw_start(size)
 
     while True:
         # This block of code generates a list of each key's pressed status (0=up, 1=pressed)
@@ -32,6 +45,7 @@ def main():
             world.car.steering = -steering_max
 
 
+        # draws the map, car and button
         view.draw_scene(world, events)
         world.car.update_pos(world.road)
 
