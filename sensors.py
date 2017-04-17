@@ -26,6 +26,9 @@ class Sensors():
         for i in range(lidar_num):
             self.lidar_angles.append(lidar_max_angle + (i * lidar_spacing))
 
+    def update_road(self, road):
+        self.road = road
+
     def get_lidar_data(self, lidar_angles=None):
         """ Outputs a list of lidar distances.
         """
@@ -71,6 +74,10 @@ class Sensors():
             # print("Off the screen")
             curr_map_value = 0
 
+        if curr_map_value == 0:
+            # print("Crashed", end='\r')
+            # raise StopIteration
+            pass
         ray_angle = angle + self.car.angle[0]
 
         dirX = sin(ray_angle)

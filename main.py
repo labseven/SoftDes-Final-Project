@@ -16,13 +16,25 @@ def main():
 
     clock = pygame.time.Clock()
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
+    start = True
+
+    while start:
+        events = get_events()
+
+        keys = pygame.key.get_pressed()
+        keys_down = [idx for idx, val in enumerate(keys) if val == 1]
+        event_keys = (pygame.K_SPACE, 0)
+        key_states = [int(key in keys_down) for key in event_keys]
+        if key_states[0] is 1:
+            start = False
+
+        view.draw_start(size)
 
     while True:
         # This block of code generates a list of each key's pressed status (0=up, 1=pressed)
         # The list is for keys [W, S, A, D]
         events = get_events()
         keys_pressed = get_input()
-        mouse_down = get_mouse_drawing(events)
 
         world.car.driving_force = (keys_pressed[0] * FORCE - keys_pressed[1] * BRAKING)
         world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
@@ -31,9 +43,9 @@ def main():
         elif world.car.steering < -steering_max:
             world.car.steering = -steering_max
 
-
+        # draws the map, car and button
         view.draw_scene(world, events)
-        world.car.update_pos()
+        world.car.update_pos(world.road)
 
         view.press_button(events)
 
@@ -48,7 +60,6 @@ def get_events():
     for e in events:
         if e.type == pygame.QUIT:  # If a quit event is received, exit
             pygame.quit()
-            sys.exit()
     return events
 
 
