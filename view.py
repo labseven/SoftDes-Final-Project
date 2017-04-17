@@ -18,6 +18,7 @@ BG_COLOR = (70, 204, 63)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 233, 0)
+RED = (203, 20, 16)
 
 
 class View():
@@ -175,37 +176,50 @@ class View():
         world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
 
 
-    def text_objects(self,text, font):
-        textSurface = font.render(text, True, YELLOW)
+    def text_objects(self,text, font, color):
+        textSurface = font.render(text, True, color)
         return textSurface, textSurface.get_rect()
 
     def draw_start(self, size):
-        screen = pygame.display.set_mode(size)
-        self.screen.fill(pygame.Color(0, 0, 0))
+        screen1 = pygame.display.set_mode(size)
+        screen1.fill(WHITE)
         pygame.font.init()
         myfont = pygame.font.Font('freesansbold.ttf', 30)
         mymedfont = pygame.font.Font('freesansbold.ttf', 40)
         mylargefont = pygame.font.Font('freesansbold.ttf', 50)
-        TextSurf, TextRect = self.text_objects('Corn HELL', mylargefont)
-        TextSurf1, TextRect1 = self.text_objects('Can you survive the', myfont)
-        TextSurf2, TextRect2 = self.text_objects('craziest track of all time...', myfont)
-        TextSurf3, TextRect3 = self.text_objects('Only you decide!', mymedfont)
-        TextSurf4, TextRect4 = self.text_objects('Create your hell now!', mylargefont)
-        TextSurf5, TextRect5 = self.text_objects('Press Space Bar to Start', myfont)
 
-        TextRect.center = ((size[0]/2),(size[1]/4))
+        corn_surf = pygame.image.load("assets/corn.png")
+
+        TextSurf, TextRect = self.text_objects('Corn', mylargefont, YELLOW)
+        TextSurfH, TextRectH = self.text_objects('HELL', mylargefont, RED)
+        TextSurf1, TextRect1 = self.text_objects('Can you survive the', myfont, YELLOW)
+        TextSurf2, TextRect2 = self.text_objects('craziest track of all time...', myfont, YELLOW)
+        TextSurf3, TextRect3 = self.text_objects('Only you decide!', mymedfont, YELLOW)
+        TextSurf4, TextRect4 = self.text_objects('Create your hell now!', mylargefont, YELLOW)
+        TextSurf5, TextRect5 = self.text_objects('Press Space Bar to Start', myfont, YELLOW)
+
+        TextRect.center = ((size[0]/2 - 75), (size[1]/4))
+        TextRectH.center = ((size[0]/2 + 75), (size[1]/4))
         TextRect1.center = ((size[0]/2),(size[1]/2 - 200))
         TextRect2.center = ((size[0]/2),(size[1]/2 - 150))
         TextRect3.center = ((size[0]/2),(size[1]/2  - 100))
         TextRect4.center = ((size[0]/2),(size[1]/2 ))
         TextRect5.center = ((size[0]/2),(size[1]/4 * 3))
 
-        screen.blit(TextSurf, TextRect)
-        screen.blit(TextSurf1, TextRect1)
-        screen.blit(TextSurf2, TextRect2)
-        screen.blit(TextSurf3, TextRect3)
-        screen.blit(TextSurf4, TextRect4)
-        screen.blit(TextSurf5, TextRect5)
+        screen1.blit(TextSurf, TextRect)
+        screen1.blit(TextSurfH, TextRectH)
+        screen1.blit(TextSurf1, TextRect1)
+        screen1.blit(TextSurf2, TextRect2)
+        screen1.blit(TextSurf3, TextRect3)
+        screen1.blit(TextSurf4, TextRect4)
+        screen1.blit(TextSurf5, TextRect5)
+
+
+        screen1.blit(corn_surf, (50, 50))
+        screen1.blit(corn_surf, (50, size[1]- 100))
+        screen1.blit(corn_surf, (size[0]-100, 50))
+        screen1.blit(corn_surf, (size[0]-100, size[1]-100))
+
         pygame.display.update()
 
 
