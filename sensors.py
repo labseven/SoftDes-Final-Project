@@ -26,6 +26,9 @@ class Sensors():
         for i in range(lidar_num):
             self.lidar_angles.append(lidar_max_angle + (i * lidar_spacing))
 
+    def update_road(self, road):
+        self.road = road
+
     def get_lidar_data(self, lidar_angles=None):
         """ Outputs a list of lidar distances.
         """

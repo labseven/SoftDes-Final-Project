@@ -32,7 +32,16 @@ class View():
         self.road_mask = self.get_road_surface(self.world.road)
 
         self.Button1 = Buttons.Button()
+        self.ready_to_draw = False
 
+        self.order_array_size = 100
+        self.order_array = []
+        for h in range(self.order_array_size):
+            row = []
+            for w in range(self.order_array_size):
+                row.append(-10)
+            self.order_array.append(row)
+        self.desirability = 0
 
     def build_obj_canvas(self):
         # Build transparent surface
@@ -42,7 +51,7 @@ class View():
 
         all_objs = [Sprite(barn_surf, 500, 500)]
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
-                        for x in range(5000)] if self.world.road[obj.x, obj.y] == 0
+                        for x in range(100)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
                         -50 <= obj.y-all_objs[0].y <= 50)])
         obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
@@ -63,15 +72,21 @@ class View():
                 raise StopIteration
             if e.type == pygame.MOUSEBUTTONDOWN:
                 self.roundline(world, color, e, e.pos,  radius)
-                self.draw_on = True
+                if self.ready_to_draw:
+                    self.ready_to_draw = False
+                    self.draw_on = True
             if e.type == pygame.MOUSEBUTTONUP:
                 self.objs = self.build_obj_canvas()
-                self.draw_on = False
+                x, y = e.pos
+                if x > 690 and x < 990 and y > 10 and y < 60:
+                    self.draw_on = False
+                    self.ready_to_draw = True
+                else:
+                    self.draw_on = False
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
                     self.roundline(world, color, e, self.last_pos,  radius)
                 self.last_pos = e.pos
-
 
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
         self.draw_car(world.car)
@@ -165,7 +180,6 @@ class View():
             width = right_val - left_val
             height = bottom_val - top_val
             world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
-
 
             pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
 

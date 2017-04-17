@@ -33,7 +33,7 @@ def main():
 
 
         view.draw_scene(world, events)
-        world.car.update_pos()
+        world.car.update_pos(world.road)
 
         view.press_button(events)
 

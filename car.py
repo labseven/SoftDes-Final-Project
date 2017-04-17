@@ -23,8 +23,9 @@ class Car():
         self.lidar_distances = []
         self.lidar_hits = []
 
-    def update_pos(self):
+    def update_pos(self, road):
         # F_net and T_net are inputs from keyboard or autonomous
+        self.sensors.update_road(road)
         delta_time = .09
 
         [self.position,
