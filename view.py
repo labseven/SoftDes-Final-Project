@@ -5,9 +5,7 @@ The View class.
 
 import pygame
 import Buttons
-from pygame.surfarray import blit_array
 import numpy as np
-from math import cos
 from random import randint
 from collections import namedtuple
 
@@ -21,6 +19,7 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 233, 0)
 RED = (203, 20, 16)
+
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
@@ -61,7 +60,6 @@ class View():
         obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
 
         return obj_surfaces
-
 
     def draw_scene(self, world, events):
         """
@@ -147,17 +145,19 @@ class View():
         return screen
 
     def draw_buttons(self):
+        # creates new button on top right corner of screen
         #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
+        # defines what happens when button is pressed
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
-                    self.world.road = np.zeros(self.size)
-                    self.road_mask = self.get_road_surface(self.world.road)
+                    self.world.road = np.zeros(self.size) #when pressed, contents of road matrix is cleared, aka set to 0
+                    self.road_mask = self.get_road_surface(self.world.road) #rerenders the road picture on the screen so it is clear fo road
 
     def roundline(self, world, color, e, end, radius):
         circ_surface = pygame.Surface((radius, radius))

@@ -43,6 +43,7 @@ def main():
         elif world.car.steering < -steering_max:
             world.car.steering = -steering_max
 
+        # draws the map, car and button
         view.draw_scene(world, events)
         world.car.update_pos(world.road)
 
@@ -56,7 +57,6 @@ def get_events():
     for e in events:
         if e.type == pygame.QUIT:
             pygame.quit()
-            sys.exit()
     return events
 
 
