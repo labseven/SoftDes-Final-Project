@@ -36,7 +36,7 @@ class World():
         self.car_start_pos = (500, 500)
         self.car_start_angle = 0
 
-        self.order_map = copy.copy(self.road)
+        self.order_map = self.road.copy()
         w, h = size
         for c in range(w):
             for r in range(h):
