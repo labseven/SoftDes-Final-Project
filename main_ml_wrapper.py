@@ -37,6 +37,6 @@ class GameState():
             reward = -1
             terminal = True
 
-        print(lidar_data, reward, terminal)
+        print(reward, terminal)
 
         return lidar_data, reward, terminal

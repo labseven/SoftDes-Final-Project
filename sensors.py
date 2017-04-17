@@ -14,7 +14,7 @@ class Sensors():
     Sensors implemented:
     Lidar with n points
     """
-    def __init__(self, car, road, world_size, lidar_num=20, lidar_max_angle=pi-.01):
+    def __init__(self, car, road, world_size, lidar_num=30, lidar_max_angle=pi-.01):
         self.car = car
         self.road = road
         self.world_size = world_size
