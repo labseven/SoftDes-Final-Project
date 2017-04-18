@@ -90,7 +90,7 @@ class Autopilot(list):
 # -----------------------------------------------------------------------------
 
 
-def evaluate_driving(message, goal_text, verbose=VERBOSE):
+def evaluate_driving(message, verbose=VERBOSE):
     """
     Given a Autopilot and a goal_text string, return the Levenshtein distance
     between the Autopilot and the goal_text as a length 1 tuple.
@@ -140,7 +140,7 @@ def mutate_autopilots(coefficients, prob_ins=0.05, prob_del=0.05, prob_sub=0.05)
 # DEAP Toolbox and Algorithm setup
 # -----------------------------------------------------------------------------
 
-def get_toolbox(text):
+def get_toolbox():
     """Return DEAP Toolbox configured to evolve given 'text' string"""
 
     # The DEAP Toolbox allows you to register aliases for functions,
@@ -152,7 +152,7 @@ def get_toolbox(text):
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
     # Genetic operators
-    toolbox.register("evaluate", evaluate_driving, goal_text=text)
+    toolbox.register("evaluate", evaluate_driving)
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", mutate_autopilots)
     toolbox.register("select", tools.selTournament, tournsize=3)
@@ -164,7 +164,7 @@ def get_toolbox(text):
     return toolbox
 
 
-def evolve_autopilot(text):
+def evolve_autopilot():
     """Use evolutionary algorithm (EA) to evolve 'text' string"""
 
     # Set random number generator initial seed so that results are repeatable.
@@ -173,7 +173,7 @@ def evolve_autopilot(text):
     random.seed(4)
 
     # Get configured toolbox and create a population of random Autopilots
-    toolbox = get_toolbox(text)
+    toolbox = get_toolbox()
     pop = toolbox.population(n=300)
 
     # Collect statistics as the EA runs
@@ -183,14 +183,16 @@ def evolve_autopilot(text):
     stats.register("min", numpy.min)
     stats.register("max", numpy.max)
 
+    hof = tools.HallOfFame(5)
     # Run simple EA
     # (See: http://deap.gel.ulaval.ca/doc/dev/api/algo.html for details)
     pop, log = algorithms.eaSimple(pop,
                                    toolbox,
                                    cxpb=0.5,    # Prob. of crossover (mating)
                                    mutpb=0.2,   # Probability of mutation
-                                   ngen=500,    # Num. of generations to run
-                                   stats=stats)
+                                   ngen=5,    # Num. of generations to run
+                                   stats=stats,
+                                   hof)
 
     return pop, log
 
@@ -200,25 +202,8 @@ def evolve_autopilot(text):
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
 
-    """    import doctest
-    doctest.testmod()"""
-
-    # Get goal message from command line (optional)
-    import sys
-    if len(sys.argv) == 1:
-        # Default goal of the evolutionary algorithm if not specified.
-        # Pretty much the opposite of http://xkcd.com/534
-        goal = "SKYNET IS NOW ONLINE"
-    else:
-        goal = " ".join(sys.argv[1:])
-
-    # Verify that specified goal contains only known valid characters
-    # (otherwise we'll never be able to evolve that string)
-    for char in goal:
-        if char not in VALID_COEFF:
-            msg = "Given text {goal!r} contains illegal character {char!r}.\n"
-            msg += "Valid set: {val!r}\n"
-            raise ValueError(msg.format(goal=goal, char=char, val=VALID_COEFF))
+    import doctest
+    doctest.testmod()
 
     # Run evolutionary algorithm
-    pop, log = evolve_autopilot(goal)
+    pop, log = evolve_autopilot()

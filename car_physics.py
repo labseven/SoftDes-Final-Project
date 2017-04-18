@@ -78,7 +78,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
 
     # speedometer print statement
     speed_mph = (int)(2.23694 * speed * 100) / 100
-    print(speed_mph, 'mph', end="\r")
+    # print(speed_mph, 'mph', end="\r")
 
     # Defines the difference between car's orientation and direction of travel
     angle_sep = theta - beta

@@ -30,10 +30,14 @@ class Car():
         self.visible = False
         self.points = [(0, 0), (0, 0), (0, 0), (0, 0)]
 
+        self.time_score = 0
+        self.points = 0
+
     def update_pos(self, road):
         # F_net and T_net are inputs from keyboard or autonomous
+        self.time_score += 1
         self.sensors.update_road(road)
-        delta_time = .09
+        delta_time = .1
 
         [self.position,
          self.velocity,
@@ -47,3 +51,10 @@ class Car():
                                                   delta_time)
 
         self.lidar_distances, self.lidar_hits = self.sensors.get_lidar_data()
+
+    def update_score(self, value_map):
+        map_x = int(self.position[0])
+        map_y = int(self.position[1])
+        current_position_score = value_map[map_y][map_x]
+        self.score = current_position_score + self.time_score
+        return self.score

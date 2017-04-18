@@ -113,7 +113,6 @@ class View():
                     world.track_points.append(e.pos)
                     self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
-
     def get_road_surface(self, road):
         """
         Renders the pixels for a road on the frame.
@@ -149,7 +148,6 @@ class View():
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
 
-
     def draw_lidar(self, car):
         """
         Draws lidar beams.
@@ -168,7 +166,7 @@ class View():
 
     def draw_buttons(self):
         # creates new button on top right corner of screen
-        #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+        # Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
