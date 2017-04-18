@@ -48,6 +48,7 @@ def main():
         world.car.update_pos(world.road)
 
         view.press_button(events)
+        world.detect_collisions()
 
         if world.detect_crash():  # If the car has crashed, reset it
             world.reset_car()
