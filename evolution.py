@@ -25,7 +25,7 @@ import evolutionary_main
 
 VALID_COEFF = numpy.arange(-1, 1.1, 0.1)
 # Control whether all Autopilots are printed as they are evaluated
-VERBOSE = True
+VERBOSE = False
 
 
 # ----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ class Autopilot(list):
     We represent the Autopilot as a list of coefficients (mutable) so it can
     be more easily manipulated by the genetic operators.
     """
-    def __init__(self):
+    def __init__(self, initial_vals=-2):
         """
         Create a new Autopilot individual.
 
@@ -58,8 +58,10 @@ class Autopilot(list):
         # Want to minimize a single objective: distance from the goal message
         self.fitness = FitnessMaximizeSingle()
 
-        # Otherwise, select an initial length between min and max
-        # and populate Autopilot with that many random characters
+        # populate Autopilot with 20 random characters
+        # print(initial_vals)
+        if initial_vals is not -2:
+            self.extend(initial_vals)
         initial_length = 20
         for i in range(initial_length):
             self.append(str(random.choice(VALID_COEFF)))
@@ -92,8 +94,8 @@ def evaluate_driving(message, verbose=VERBOSE):
     """
 
     pilot_instance = list(message)
-    distance = evolutionary_main.main(True, False, pilot_instance)
-
+    distance = evolutionary_main.main(True, True, pilot_instance)
+    print('Broke')
     if verbose:
         print("{msg!s}\t[Distance: {dst!s}]".format(msg=message, dst=distance))
     return (distance, )     # Length 1 tuple, required by DEAP
@@ -127,9 +129,10 @@ def mutate_autopilots(coefficients, prob_ins=0.05, prob_del=0.05, prob_sub=0.05)
         index = random.randint(0, len(coefficients) - 1)
         coefficients[index] = random.choice(VALID_COEFF)
 
-    message = ''.join(coefficients)
+    # message = ''.join(coefficients)
+    # print('mutated: ', message)
 
-    return (message, )   # Length 1 tuple, required by DEAP
+    return(Autopilot(coefficients), )   # Length 1 tuple, required by DEAP
 
 
 # -----------------------------------------------------------------------------
@@ -170,8 +173,7 @@ def evolve_autopilot():
 
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
-    pop = toolbox.population(n=100)
-
+    pop = toolbox.population(n=20)
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)

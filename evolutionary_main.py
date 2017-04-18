@@ -10,7 +10,7 @@ steering_max = pi/2-.1
 INCREMENT = pi/4
 
 
-def main(draw=False, control=False, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]):
+def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]):
     # print(autopilot)
     size = (1000, 1000)
     world = World(size)
@@ -81,15 +81,18 @@ def main(draw=False, control=False, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             return score
         else:
             score = hold
-        # print(score, end='\r')
-        if world.car.time_score > 6000:
+        print(score, end='\r')
+        if world.car.time_score > 300:
+            print('TIMED OUT')
             return score
         if world.detect_crash():  # If the car has crashed, reset it
             reset_car(world)
             if score == 9.51:
                 score = 0
             print('FINAL SCORE:', score)
-            return score
+            print(view.ready_to_draw, view.draw_on)
+            if not view.ready_to_draw and view.draw_on:
+                return score
 
         clock.tick(60)
 
