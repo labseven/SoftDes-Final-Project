@@ -17,27 +17,27 @@ import numpy    # Used for statistics
 from deap import algorithms
 from deap import base
 from deap import tools
+import evolutionary_main
 
 # -----------------------------------------------------------------------------
 #  Global variables
 # -----------------------------------------------------------------------------
 
 VALID_COEFF = numpy.arange(-1, 1.1, 0.1)
-print(VALID_COEFF)
 # Control whether all Autopilots are printed as they are evaluated
 VERBOSE = True
 
 
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Autopilot object to use in evolutionary algorithm
 # -----------------------------------------------------------------------------
 
-class FitnessMinimizeSingle(base.Fitness):
+class FitnessMaximizeSingle(base.Fitness):
     """
     Class representing the fitness of a given individual, with a single
     objective that we want to minimize (weight = -1)
     """
-    weights = (-1.0, )
+    weights = (1.0, )
 
 
 class Autopilot(list):
@@ -47,7 +47,7 @@ class Autopilot(list):
     We represent the Autopilot as a list of coefficients (mutable) so it can
     be more easily manipulated by the genetic operators.
     """
-    def __init__(self, starting_string=None, min_length=4, max_length=30):
+    def __init__(self):
         """
         Create a new Autopilot individual.
 
@@ -56,19 +56,13 @@ class Autopilot(list):
         message with length between min_length and max_length.
         """
         # Want to minimize a single objective: distance from the goal message
-        self.fitness = FitnessMinimizeSingle()
-
-        # Populate Autopilot using starting_string, if given
-        if starting_string:
-            self.extend(list(starting_string))
+        self.fitness = FitnessMaximizeSingle()
 
         # Otherwise, select an initial length between min and max
         # and populate Autopilot with that many random characters
-        else:
-            initial_length = random.randint(min_length, max_length)
-            for i in range(initial_length):
-                # TODO: random choice of coefficients
-                pass
+        initial_length = 20
+        for i in range(initial_length):
+            self.append(str(random.choice(VALID_COEFF)))
 
     def __repr__(self):
         """Return a string representation of the Autopilot"""
@@ -96,7 +90,9 @@ def evaluate_driving(message, verbose=VERBOSE):
     between the Autopilot and the goal_text as a length 1 tuple.
     If verbose is True, print each Autopilot as it is evaluated.
     """
-    # TODO: Implement method which determines fitness of a given individual
+
+    pilot_instance = list(message)
+    distance = evolutionary_main.main(True, False, pilot_instance)
 
     if verbose:
         print("{msg!s}\t[Distance: {dst!s}]".format(msg=message, dst=distance))
@@ -174,7 +170,7 @@ def evolve_autopilot():
 
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
-    pop = toolbox.population(n=300)
+    pop = toolbox.population(n=100)
 
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
@@ -188,10 +184,10 @@ def evolve_autopilot():
     # (See: http://deap.gel.ulaval.ca/doc/dev/api/algo.html for details)
     pop, log = algorithms.eaSimple(pop,
                                    toolbox,
-                                   cxpb=0.5,    # Prob. of crossover (mating)
-                                   mutpb=0.2,   # Probability of mutation
-                                   ngen=5,    # Num. of generations to run
-                                   stats=stats,
+                                   0.5,    # Prob. of crossover (mating)
+                                   0.2,   # Probability of mutation
+                                   50,    # Num. of generations to run
+                                   stats,
                                    hof)
 
     return pop, log
@@ -201,9 +197,6 @@ def evolve_autopilot():
 # Run if called from the command line
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-
-    import doctest
-    doctest.testmod()
 
     # Run evolutionary algorithm
     pop, log = evolve_autopilot()

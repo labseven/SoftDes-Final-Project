@@ -17,7 +17,7 @@ class Car():
         self.steering = 0
         self.accelerometer = 0
         self.size = (4, 8)
-
+        self.last_position_score = 0
         self.sensors = Sensors(self, road, world_size)
 
         # Drawing things
@@ -35,7 +35,7 @@ class Car():
 
     def update_pos(self, road):
         # F_net and T_net are inputs from keyboard or autonomous
-        self.time_score += 1
+        self.time_score += .1
         self.sensors.update_road(road)
         delta_time = .1
 
@@ -56,5 +56,9 @@ class Car():
         map_x = int(self.position[0])
         map_y = int(self.position[1])
         current_position_score = value_map[map_y][map_x]
-        self.score = current_position_score + self.time_score
+        if current_position_score < self.last_position_score:
+            return -1
+        self.last_position_score = current_position_score
+        # print(current_position_score, end='\r')
+        self.score = current_position_score  # + self.time_score
         return self.score

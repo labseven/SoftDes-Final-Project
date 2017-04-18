@@ -6,7 +6,7 @@ from car import Car
 # import scipy.ndimage as misc
 from random import randint
 from math import pi
-
+import pickle
 import numpy as np
 
 
@@ -31,24 +31,25 @@ class World():
         self.road = np.zeros(size)
         self.track_points = []
         # self.road = misc.imread('assets/track.png', mode='L')
+        self.car_start_pos = (500, 500)
+        self.car_start_angle = 0
+
+        self.reward_matrix = np.zeros(size)
+
+        try:
+            # print('Updated Road and reward files')
+            self.road = pickle.load(open("road.p", "rb"))
+            self.reward_matrix = pickle.load(open("reward.p", "rb"))
+            self.car_start_position, self.car_start_angle = pickle.load(open("pos_ang.p", "rb"))
+        except:
+            print('Pickle Files Not Found.')
+
         self.car = Car(self.road, size, [200, 500], [0, 1], [0.1, 0],
                        car_color=(randint(0, 255),
                                   randint(0, 255),
                                   randint(0, 255)))
 
-        self.car_start_pos = (500, 500)
-        self.car_start_angle = 0
-
-        self.order_map = self.road.copy()
-        w, h = size
-        for c in range(w):
-            for r in range(h):
-                if self.order_map[r][c] > 0:
-                    self.order_map[r][c] = 1
-
         self.checkpoints = []
-
-        self.reward_matrix = np.zeros(size)
 
     def detect_crash(self):
         """
@@ -70,6 +71,7 @@ class World():
         self.car.position = self.car_start_pos  # Set the car at the starting point
         self.car.angle = [self.car_start_angle, 0]  # Set the car at the starting heading
         self.car.velocity = [0, 0]  # Stop the car
+        self.car.visible = True
 
     def update_checkpoints(self, num_checkpoints=100):
         track_points_len = len(self.track_points)
@@ -77,15 +79,22 @@ class World():
         self.checkpoints = [self.track_points[idx] for idx in checkpoint_indices]
         self.update_reward_matrix()
 
+        combined_save = [self.car_start_pos, self.car_start_angle]
+
+        pickle.dump(self.road, open('road.p', 'wb'))
+        pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
+        pickle.dump(combined_save, open('pos_ang.p', 'wb'))
+
     def update_reward_matrix(self):
         checks = len(self.checkpoints)
         for value, checkpoint in enumerate(self.checkpoints):
+            c_value = (value + .1) / 10
             radius = 50
             print('Rendering Reward Matrix:', (int)((value/checks)*10000) / 100, 'Percent Complete', end='\r')
             for y, row in enumerate(self.reward_matrix):
                 for x, rand in enumerate(row):
                     x_dist = abs(x - checkpoint[0])
                     y_dist = abs(y - checkpoint[1])
-                    if x_dist < radius and y_dist < radius:
-                        self.reward_matrix[y][x] = value / 10
-        print(end='\r')
+                    if x_dist < radius and y_dist < radius and rand == 0:
+                        self.reward_matrix[y][x] = c_value
+        print('                                                         ', end='\r')

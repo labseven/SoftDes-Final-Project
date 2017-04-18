@@ -26,6 +26,21 @@ class Sensors():
         for i in range(lidar_num):
             self.lidar_angles.append(lidar_max_angle + (i * lidar_spacing))
 
+    def calculate_changes(self, autopilot):
+        distances = self.get_lidar_data()
+        angles = self.lidar_angles
+        x_vals = 0.0
+        y_vals = 0.0
+        for distance in distances:
+            for idx, dist in enumerate(distance):
+                if idx == 0:
+                    idx = 1
+                else:
+                    if type(dist) is float:
+                        x_vals += ((float)(autopilot[idx]) * dist * cos(angles[idx]))
+                        y_vals += ((float)(autopilot[idx]) * dist * sin(angles[idx]))
+        return((x_vals, y_vals))
+
     def update_road(self, road):
         self.road = road
 
@@ -43,7 +58,6 @@ class Sensors():
             hit_pos.append(lidar[1])
 
         return distances, hit_pos
-
 
     def get_lidar_distance(self, angle, return_square_dist=False):
         """ Return the distance from car to the nearest wall, in the direction

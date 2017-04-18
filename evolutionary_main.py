@@ -2,13 +2,16 @@ from world import World
 from view import View
 import pygame
 from math import pi
+import pickle
+
 FORCE = -1000
 BRAKING = -500
 steering_max = pi/2-.1
 INCREMENT = pi/4
 
 
-def main(draw=True, autopilot=[0, 0, 0, 0, 0, 0, 0, 0]):
+def main(draw=False, control=False, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]):
+    # print(autopilot)
     size = (1000, 1000)
     world = World(size)
 
@@ -17,8 +20,9 @@ def main(draw=True, autopilot=[0, 0, 0, 0, 0, 0, 0, 0]):
     clock = pygame.time.Clock()
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
     start = True
+    score = 0
 
-    if draw:
+    """if draw:
         while start:
             events = get_events()
 
@@ -30,23 +34,36 @@ def main(draw=True, autopilot=[0, 0, 0, 0, 0, 0, 0, 0]):
                 start = False
 
             view.draw_start(size)
+"""
+    reset_car(world)
+    # print(world.car.position)
 
     while True:
         # This block of code generates a list of each key's pressed status (0=up, 1=pressed)
         # The list is for keys [W, S, A, D]
+        events = get_events()
+
         if draw:
-            events = get_events()
+            # draws the map, car and button
+            view.draw_scene(world, events)
+            view.press_button(events)
+        if control:
             keys_pressed = get_input()
 
             world.car.driving_force = (keys_pressed[0] * FORCE - keys_pressed[1] * BRAKING)
             world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
+        else:
+            # Of the form (turn, accelerator)
+            # print('k')
+            d_steer, d_gas = world.car.sensors.calculate_changes(autopilot)
 
-            # draws the map, car and button
-            view.draw_scene(world, events)
-            view.press_button(events)
+            if d_gas > 1:
+                d_gas = 1
+            if d_gas < -1:
+                d_gas = -1
 
-        # Of the form (turn, accelerator)
-        # pilot_commands = sensors.calculate_changes(autopilot)
+            world.car.driving_force = d_gas * FORCE
+            world.car.steering += d_steer
 
         if world.car.steering > steering_max:
             world.car.steering = steering_max
@@ -55,14 +72,38 @@ def main(draw=True, autopilot=[0, 0, 0, 0, 0, 0, 0, 0]):
 
         world.car.update_pos(world.road)
 
-        score = world.car.update_score(world.reward_matrix)
-
-        print(score, end='\r')
+        hold = world.car.update_score(world.reward_matrix)
+        if hold == -1:
+            print('WENT DOWN IN VALUE:', score)
+            reset_car(world)
+            if world.car.time_score < 50:
+                return 0
+            return score
+        else:
+            score = hold
+        # print(score, end='\r')
+        if world.car.time_score > 6000:
+            return score
         if world.detect_crash():  # If the car has crashed, reset it
+            reset_car(world)
+            if score == 9.51:
+                score = 0
             print('FINAL SCORE:', score)
             return score
 
         clock.tick(60)
+
+
+def reset_car(world):
+    # print('Attempting to Reset Car')
+    try:
+        temp_position, temp_angle = pickle.load(open("pos_ang.p", "rb"))
+
+        world.car_start_pos = temp_position
+        world.car_start_angle = temp_angle
+        world.reset_car()
+    except:
+        print('Reset Failed. Draw New Track')
 
 
 def get_events():
