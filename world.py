@@ -63,7 +63,7 @@ class World():
             # Difference in positions
             diff_pos = (self.car.position[0]-checkpoint[0], self.car.position[1]-checkpoint[1])
             if (diff_pos[0]**2 + diff_pos[1] ** 2)**(1/2) < 10:  # A checkpoint has been hit
-                print("Hit!")
+                print("Checkpoint hit!\n")
                 self.checkpoints.remove(checkpoint)  # Remove that checkpoint
 
     def reset_car(self):
