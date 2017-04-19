@@ -2,6 +2,7 @@ from world import World
 from view import View
 import pygame
 from math import pi
+
 FORCE = -500
 BRAKING = -1000
 INCREMENT = pi / 10
@@ -9,6 +10,10 @@ steering_max = pi/2-.1
 
 
 def main():
+    """
+    Initializes the world and draws the launch screen.
+    Then it loops through the game until the user quits."""
+
     size = (1000, 1000)
     world = World(size)
 
@@ -18,8 +23,23 @@ def main():
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
     start = True
 
+    # Play intro music
     pygame.mixer.music.load('assets/corn_racer.mp3')
     pygame.mixer.music.play(loops=-1)
+
+    # Initialize sounds
+    pygame.mixer.music.stop()
+    low_sound = pygame.mixer.Sound('assets/car_low.ogg')
+    low_sound.set_volume(0)
+    low_sound.play(loops=-1, fade_ms=100)
+
+    high_sound = pygame.mixer.Sound('assets/car_high.ogg')
+    high_sound.set_volume(0)
+    high_sound.play(loops=-1, fade_ms=100)
+
+    crash_sound = pygame.mixer.Sound('assets/crash.ogg')
+
+    # Launch screen
     while start:
         events = get_events()
 
@@ -32,19 +52,10 @@ def main():
 
         view.draw_start(size)
 
-    pygame.mixer.music.stop()
-    low_sound = pygame.mixer.Sound('assets/car_low.ogg')
-    low_sound.set_volume(0)
-    low_sound.play(loops=-1, fade_ms=100)
 
-    high_sound = pygame.mixer.Sound('assets/car_high.ogg')
-    high_sound.set_volume(0)
-    high_sound.play(loops=-1, fade_ms=100)
-
-    crash_sound = pygame.mixer.Sound('assets/crash.ogg')
-
+    # Driving screen
     while True:
-        # This block of code generates a list of each key's pressed status (0=up, 1=pressed)
+        # Generate a list of each key's pressed status (0=up, 1=pressed)
         # The list is for keys [W, S, A, D]
         events = get_events()
         keys_pressed = get_input()
@@ -56,7 +67,7 @@ def main():
         elif world.car.steering < -steering_max:
             world.car.steering = -steering_max
 
-        # draws the map, car and button
+        # Draw the map, car and button
         view.draw_scene(world, events)
         world.car.update_pos(world.road)
 
@@ -65,15 +76,17 @@ def main():
 
         # Car Sounds
         if world.car.visible:
-            velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2 # 100 is slow, 200 is medium, 300 is fast
-            volume = (velocity - 150) / 250
+            velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2
+            volume = (velocity - 150) / 250 # 150 is slow, 400 is fast
             if volume > 1:
                 volume = 1
             if volume < 0:
                 volume = 0
 
+            # Crossfade volume from low to high as velocity increases
             low_sound.set_volume(.5 - (volume/2))
             high_sound.set_volume(volume)
+
 
         if world.car.visible:
             if world.detect_crash():  # If the car has crashed, reset it
