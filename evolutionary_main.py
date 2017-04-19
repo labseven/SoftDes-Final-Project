@@ -64,7 +64,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
             # print(d_gas)
             world.car.driving_force = 2.5 * d_gas * FORCE
-            world.car.steering += d_steer * 5
+            world.car.steering += d_steer * 20
 
         if world.car.steering > steering_max:
             world.car.steering = steering_max
@@ -83,13 +83,12 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
         else:
             score = hold
         # print(score, end='\r')
-        if world.car.time_score > 1000:
+        if world.car.time_score > 300:
             # print('TIMED OUT')
-            return score
+            return 0
         if world.detect_crash():  # If the car has crashed, reset it
             reset_car(world)
-            if score == 9.51:
-                score = 0
+
             # print('FINAL SCORE:', score)
 
             return score

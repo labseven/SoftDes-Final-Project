@@ -30,7 +30,7 @@ class View():
         self.world = map_in
         self.screen = pygame.display.set_mode(size)
         self.draw_on = False
-        self.objs = self.build_obj_canvas()
+        # self.objs = self.build_obj_canvas()
         self.road_mask = self.get_road_surface(self.world.road)
 
         self.Button1 = Buttons.Button()
@@ -75,7 +75,7 @@ class View():
             self.draw_car(world.car)  # Draw on car
             for checkpoint in world.checkpoints:
                 pygame.draw.rect(self.screen, (255, 255, 255), (checkpoint[0], checkpoint[1], 10, 10), 0)
-        self.screen.blit(self.objs, (0, 0))
+        # self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
 

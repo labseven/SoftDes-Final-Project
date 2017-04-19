@@ -78,7 +78,10 @@ class Autopilot(list):
 
     def get_text(self):
         """Return Autopilot as string (rather than actual list of chars)"""
-        return "".join(self)
+        try:
+            return "".join(self)
+        except(TypeError):
+            return 'FAILED'
 
 
 # -----------------------------------------------------------------------------
@@ -92,6 +95,10 @@ def evaluate_driving(message, verbose=VERBOSE):
     between the Autopilot and the goal_text as a length 1 tuple.
     If verbose is True, print each Autopilot as it is evaluated.
     """
+
+    file_object = open('Pilots.txt', 'a')
+    file_object.write('\n' + message.get_text())
+    file_object.close()
 
     pilot_instance = list(message)
     distance = evolutionary_main.main(True, False, pilot_instance)
@@ -142,7 +149,7 @@ def get_toolbox():
     toolbox.register("evaluate", evaluate_driving)
     toolbox.register("mate", tools.cxTwoPoint)
     toolbox.register("mutate", mutate_autopilots)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("select", tools.selTournament, tournsize=5)
 
     # NOTE: You can also pass function arguments as you define aliases, e.g.
     #   toolbox.register("individual", Autopilot, max_length=200)
@@ -161,7 +168,7 @@ def evolve_autopilot():
 
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
-    pop = toolbox.population(n=100)
+    pop = toolbox.population(n=20)
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
@@ -176,7 +183,7 @@ def evolve_autopilot():
     pop, log = algorithms.eaSimple(pop,
                                    toolbox,
                                    0.5,    # Prob. of crossover (mating)
-                                   0.2,   # Probability of mutation
+                                   0.8,   # Probability of mutation
                                    50,    # Num. of generations to run
                                    stats,
                                    hof)

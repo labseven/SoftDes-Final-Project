@@ -9,6 +9,9 @@ class Car():
     """
 
     def __init__(self, road, world_size, init_pos, init_angle, init_vel, mass=500, moment=200, car_color=(124, 124, 124)):
+        self.speed_total = 0
+        self.iterations = 0
+
         self.position = init_pos
         self.angle = init_angle
         self.velocity = init_vel
@@ -49,6 +52,9 @@ class Car():
                                                   self.mass,
                                                   self.moment,
                                                   delta_time)
+        self.iterations += 1
+        self.speed_total += (self.velocity[0]**2 + self.velocity[1]**2)**.5
+        self.average_speed = self.speed_total / self.iterations
 
         self.lidar_distances, self.lidar_hits = self.sensors.get_lidar_data()
 
@@ -57,8 +63,9 @@ class Car():
         map_y = int(self.position[1])
         current_position_score = value_map[map_y][map_x]
         if current_position_score < self.last_position_score:
-            return -1
+            return(-1)
         self.last_position_score = current_position_score
         # print(current_position_score, end='\r')
-        self.score = current_position_score # / (self.time_score / 100)
-        return self.score
+        self.score = current_position_score + self.speed_total
+        # print(self.average_speed)
+        return(self.score)
