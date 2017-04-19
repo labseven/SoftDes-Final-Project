@@ -18,6 +18,8 @@ def main():
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
     start = True
 
+    pygame.mixer.music.load('assets/corn_racer.mp3')
+    pygame.mixer.music.play(loops=-1)
     while start:
         events = get_events()
 
@@ -29,6 +31,13 @@ def main():
             start = False
 
         view.draw_start(size)
+
+    pygame.mixer.music.stop()
+    low_sound = pygame.mixer.Sound('assets/car_low.ogg')
+    low_sound.set_volume(.5)
+    low_sound.play(loops=-1, fade_ms=100)
+
+    crash_sound = pygame.mixer.Sound('assets/crash.ogg')
 
     while True:
         # This block of code generates a list of each key's pressed status (0=up, 1=pressed)
@@ -50,6 +59,7 @@ def main():
         view.press_button(events)
 
         if world.detect_crash():  # If the car has crashed, reset it
+            crash_sound.play()
             world.reset_car()
 
         clock.tick(60)
