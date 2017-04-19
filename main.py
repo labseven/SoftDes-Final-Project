@@ -37,6 +37,10 @@ def main():
     low_sound.set_volume(.5)
     low_sound.play(loops=-1, fade_ms=100)
 
+    high_sound = pygame.mixer.Sound('assets/car_high.ogg')
+    high_sound.set_volume(0)
+    high_sound.play(loops=-1, fade_ms=100)
+
     crash_sound = pygame.mixer.Sound('assets/crash.ogg')
 
     while True:
@@ -57,6 +61,16 @@ def main():
         world.car.update_pos(world.road)
 
         view.press_button(events)
+
+        velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2 # 100 is slow, 200 is medium, 300 is fast
+        volume = (velocity - 150) / 250
+        if volume > 1:
+            volume = 1
+        if volume < 0:
+            volume = 0
+            
+        print("\n", volume, "\r\r")
+        high_sound.set_volume(volume)
 
         if world.detect_crash():  # If the car has crashed, reset it
             crash_sound.play()
