@@ -34,7 +34,7 @@ class View():
         self.road_mask = self.get_road_surface(self.world)
 
         self.Button1 = Buttons.Button()
-        self.ready_to_draw = False
+        self.ready_to_draw = True
 
         self.order_array_size = 100
         self.order_array = []
@@ -74,9 +74,9 @@ class View():
         # self.draw_starting_line(world)
         if world.car.visible:
             self.draw_car(world.car)  # Draw on car
-            for checkpoint in world.checkpoints:
-                checkpoint_surf = pygame.image.load("assets/checkpoint.png")
-                self.screen.blit(checkpoint_surf, (checkpoint[0], checkpoint[1]-32))
+            # for checkpoint in world.checkpoints:
+            #     checkpoint_surf = pygame.image.load("assets/checkpoint.png")
+            #     self.screen.blit(checkpoint_surf, (checkpoint[0], checkpoint[1]-32))
         self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
@@ -144,7 +144,7 @@ class View():
                 if world.road[x, y] == 255:
                     mask.set_at((x, y), ROAD_COLOR)
 
-        self.draw_starting_line(world, mask)
+        # self.draw_starting_line(world, mask)
         # TODO Make this less wildly computationally inefficient
         for x in range(0, world.road.shape[0]):
             for y in range(0, world.road.shape[1]):
@@ -194,12 +194,14 @@ class View():
         return screen
 
     def draw_buttons(self):
-        # creates new button on top right corner of screen
-        #Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+        """
+        Creates new button on top right corner of screen
+        Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+        """
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
-        # defines what happens when button is pressed
+        # Defines what happens when button is pressed
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
