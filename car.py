@@ -16,22 +16,27 @@ class Car():
         self.moment = moment
         self.steering = 0
         self.accelerometer = 0
-        self.size = (4, 8)
 
-        self.sensors = Sensors(self, road, world_size)
-
-        # Drawing things
-        self.color = car_color
+        # Sensors
         self.sensors = Sensors(self, road, world_size)
         self.lidar_distances = []
         self.lidar_hits = []
+
+        # Drawing things
+        self.color = car_color
         self.sprite_w = 16
         self.sprite_h = 32
         self.visible = False
         self.points = [(0, 0), (0, 0), (0, 0), (0, 0)]
 
     def update_pos(self, road):
-        # F_net and T_net are inputs from keyboard or autonomous
+        """
+        Moves car one time step.
+        Applies physics based on state variables, including velocity,
+        accelerometer input, and steering wheel input.
+
+        Updates car position and sensor readouts.
+        """
         self.sensors.update_road(road)
         delta_time = .09
 
