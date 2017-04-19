@@ -46,6 +46,10 @@ class View():
         self.desirability = 0
 
     def build_obj_canvas(self, barn_pos=(500, 500), num_corn=100):
+        """
+        Creates canvas of all static objects (corn and barn) for faster frame
+        updates.
+        """
         # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
