@@ -6,18 +6,7 @@ from car import Car
 # import scipy.ndimage as misc
 from random import randint
 from math import pi
-
 import numpy as np
-
-
-class World_Map():
-    def __init__(self, size):
-        self.world_map = np.zeros(size)
-        self.world_map_size = size
-        # Quick wall for testing
-        for i in range(size[0]):
-            self.world_map[i][i] = 1
-        print("Made world_map")
 
 
 class World():
@@ -26,7 +15,6 @@ class World():
         Initializes the numpy matrix for the road and creates a car.
         """
 
-        # self.road = World_Map(size)
         self.road = np.zeros(size)
         self.track_points = []
         # self.road = misc.imread('assets/track.png', mode='L')
