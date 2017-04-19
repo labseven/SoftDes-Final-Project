@@ -61,6 +61,7 @@ def main():
         world.car.update_pos(world.road)
 
         view.press_button(events)
+        world.detect_collisions()
 
         velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2 # 100 is slow, 200 is medium, 300 is fast
         volume = (velocity - 150) / 250
