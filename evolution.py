@@ -94,36 +94,24 @@ def evaluate_driving(message, verbose=VERBOSE):
     """
 
     pilot_instance = list(message)
-    distance = evolutionary_main.main(True, True, pilot_instance)
-    print('Broke')
+    distance = evolutionary_main.main(True, False, pilot_instance)
     if verbose:
         print("{msg!s}\t[Distance: {dst!s}]".format(msg=message, dst=distance))
     return (distance, )     # Length 1 tuple, required by DEAP
 
 
-def mutate_autopilots(coefficients, prob_ins=0.05, prob_del=0.05, prob_sub=0.05):
+def mutate_autopilots(coefficients, prob_sub=0.05):
     """
     Given a Autopilot and independent probabilities for each mutation type,
     return a length 1 tuple containing the mutated Autopilot.
 
     Possible mutations are:
-        Insertion:      Insert a random (legal) coefficient somewhere into
-                        the Autopilot
-        Deletion:       Delete one of the coefficients from the Autopilot
         Substitution:   Replace one coefficients of the Autopilot with a random
                         (legal) coefficient
 
     >>> mutate_autopilots('hello', 1, 1, 1)
     """
     coefficients = list(coefficients)
-
-    if random.random() < prob_ins:
-        index = random.randint(0, len(coefficients) - 1)
-        coefficients.insert(index, random.choice(VALID_COEFF))
-
-    if random.random() < prob_del:
-        index = random.randint(0, len(coefficients) - 1)
-        coefficients.pop(index)
 
     if random.random() < prob_sub:
         index = random.randint(0, len(coefficients) - 1)
@@ -169,11 +157,11 @@ def evolve_autopilot():
     # Set random number generator initial seed so that results are repeatable.
     # See: https://docs.python.org/2/library/random.html#random.seed
     #      and http://xkcd.com/221
-    random.seed(4)
+    # random.seed(6)
 
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
-    pop = toolbox.population(n=20)
+    pop = toolbox.population(n=100)
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
@@ -182,6 +170,7 @@ def evolve_autopilot():
     stats.register("max", numpy.max)
 
     hof = tools.HallOfFame(5)
+    print(hof)
     # Run simple EA
     # (See: http://deap.gel.ulaval.ca/doc/dev/api/algo.html for details)
     pop, log = algorithms.eaSimple(pop,
@@ -192,6 +181,7 @@ def evolve_autopilot():
                                    stats,
                                    hof)
 
+    print(hof)
     return pop, log
 
 

@@ -62,8 +62,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             if d_gas < -1:
                 d_gas = -1
 
-            world.car.driving_force = d_gas * FORCE
-            world.car.steering += d_steer
+            # print(d_gas)
+            world.car.driving_force = 2.5 * d_gas * FORCE
+            world.car.steering += d_steer * 5
 
         if world.car.steering > steering_max:
             world.car.steering = steering_max
@@ -74,25 +75,24 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
         hold = world.car.update_score(world.reward_matrix)
         if hold == -1:
-            print('WENT DOWN IN VALUE:', score)
+            # print('WENT DOWN IN VALUE:', score)
             reset_car(world)
             if world.car.time_score < 50:
                 return 0
             return score
         else:
             score = hold
-        print(score, end='\r')
-        if world.car.time_score > 300:
-            print('TIMED OUT')
+        # print(score, end='\r')
+        if world.car.time_score > 1000:
+            # print('TIMED OUT')
             return score
         if world.detect_crash():  # If the car has crashed, reset it
             reset_car(world)
             if score == 9.51:
                 score = 0
-            print('FINAL SCORE:', score)
-            print(view.ready_to_draw, view.draw_on)
-            if not view.ready_to_draw and view.draw_on:
-                return score
+            # print('FINAL SCORE:', score)
+
+            return score
 
         clock.tick(60)
 

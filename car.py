@@ -60,5 +60,5 @@ class Car():
             return -1
         self.last_position_score = current_position_score
         # print(current_position_score, end='\r')
-        self.score = current_position_score  # + self.time_score
+        self.score = current_position_score # / (self.time_score / 100)
         return self.score
