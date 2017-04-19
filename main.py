@@ -63,6 +63,7 @@ def main():
         view.press_button(events)
         world.detect_collisions()
 
+        # Car Sounds
         if world.car.visible:
             velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2 # 100 is slow, 200 is medium, 300 is fast
             volume = (velocity - 150) / 250
@@ -72,7 +73,7 @@ def main():
                 volume = 0
 
             print("\n", volume, "\r\r")
-            low_sound.set_volume(.5)
+            low_sound.set_volume(.5 - (volume/2))
             high_sound.set_volume(volume)
 
         if world.car.visible:
