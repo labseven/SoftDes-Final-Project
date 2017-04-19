@@ -72,7 +72,6 @@ def main():
             if volume < 0:
                 volume = 0
 
-            print("\n", volume, "\r\r")
             low_sound.set_volume(.5 - (volume/2))
             high_sound.set_volume(volume)
 
