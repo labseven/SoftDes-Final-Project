@@ -90,7 +90,8 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             reset_car(world)
 
             # print('FINAL SCORE:', score)
-
+            if score == 9.61:
+                score = 0
             return score
 
         clock.tick(60)

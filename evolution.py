@@ -12,7 +12,6 @@ https://sites.google.com/site/sd15spring/home/project-toolbox/evolutionary-algor
 """
 
 import random
-
 import numpy    # Used for statistics
 from deap import algorithms
 from deap import base
@@ -168,7 +167,7 @@ def evolve_autopilot():
 
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
-    pop = toolbox.population(n=50)
+    pop = toolbox.population(n=100)
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
@@ -184,7 +183,7 @@ def evolve_autopilot():
                                    toolbox,
                                    0.5,    # Prob. of crossover (mating)
                                    0.8,   # Probability of mutation
-                                   20,    # Num. of generations to run
+                                   30,    # Num. of generations to run
                                    stats,
                                    hof)
 

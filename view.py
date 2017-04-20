@@ -22,6 +22,12 @@ RED = (203, 20, 16)
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
+        car_width = 16
+        car_height = 32
+        self.L_R = np.matrix([[-car_width / 2], [car_height / 2]])
+        self.L_F = np.matrix([[-car_width / 2], [-car_height / 2]])
+        self.R_R = np.matrix([[car_width / 2], [car_height / 2]])
+        self.R_F = np.matrix([[car_width / 2], [-car_height / 2]])
         self.track_points = []  # List of mouse points on track
         self.bg_color = (70, 204, 63)
 
@@ -144,19 +150,40 @@ class View():
 
         new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
         #width = 16, height = 32
-        # back_l
-        # front_l
-        # back_r
-        # front_r
-        car.points = [new_rect.topleft, new_rect.topright, new_rect.bottomright, new_rect.bottomleft]
+        rotation_matrix = np.matrix([[math.cos(theta), -1 * math.sin(theta)],
+                                     [math.sin(theta), math.cos(theta)]])
+        position_matrix = np.matrix([[x_pos], [y_pos]])
+
+        potential_fix = np.matrix([[math.cos(car.init_angle[0])*car.sprite_w-8], [math.sin(-car.init_angle[0])*car.sprite_w+16]])
+
+        back_l = rotation_matrix * self.L_R + position_matrix + potential_fix
+        frnt_l = rotation_matrix * self.L_F + position_matrix + potential_fix
+        back_r = rotation_matrix * self.R_R + position_matrix + potential_fix
+        frnt_r = rotation_matrix * self.R_F + position_matrix + potential_fix
+
+        back_l = ((int)(back_l.item(0)), (int)(back_l.item(1)))
+        frnt_l = ((int)(frnt_l.item(0)), (int)(frnt_l.item(1)))
+        back_r = ((int)(back_r.item(0)), (int)(back_r.item(1)))
+        frnt_r = ((int)(frnt_r.item(0)), (int)(frnt_r.item(1)))
+        # print((back_l[0]**2 + back_l[1]**2)**.5)
+        # print([(int)(back_l[0]-x_pos), (int)(back_l[1]-y_pos)], [(int)(frnt_l[0]-x_pos), (int)(frnt_l[1]-y_pos)], [(int)(back_r[0]-x_pos), (int)(back_r[1]-y_pos)], [(int)(frnt_r[0]-x_pos), (int)(frnt_r[1]-y_pos)])
+        # print([(int)(back_l[0]), (int)(back_l[1])], [(int)(frnt_l[0]), (int)(frnt_l[1])], [(int)(back_r[0]), (int)(back_r[1])], [(int)(frnt_r[0]), (int)(frnt_r[1])])
+
+        # car.points = [new_rect.topleft, new_rect.topright, new_rect.bottomright, new_rect.bottomleft]
+        # print(back_l)
+        car.points = [back_l, frnt_l, frnt_r, back_r]
+        #print(car.points)
+
         # print(new_rect.__str__(), car.points)
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
 
     def draw_lidar(self, car):
         """
-        Draws lidar beams.
+        Draws lidar beams
         """
+        pygame.draw.polygon(self.screen, WHITE, car.points)
+
         for hit in car.lidar_hits:
             pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), hit)
 

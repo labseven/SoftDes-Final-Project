@@ -12,6 +12,8 @@ class Car():
         self.speed_total = 0
         self.iterations = 0
 
+        self.init_angle = init_angle
+
         self.position = init_pos
         self.angle = init_angle
         self.velocity = init_vel
