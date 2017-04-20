@@ -301,6 +301,11 @@ class View():
         screen1.blit(TextSurf8, TextRect8)
         screen1.blit(TextSurf5, TextRect5)
 
+        screen1.blit(corn_surf, (50, 50))
+        screen1.blit(corn_surf, (50, size[1]-100))
+        screen1.blit(corn_surf, (size[0]-100, 50))
+        screen1.blit(corn_surf, (size[0]-100, size[1]-100))
+
         pygame.display.update()
 
 
