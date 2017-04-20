@@ -25,6 +25,7 @@ class Sensors():
 
         for i in range(lidar_num):
             self.lidar_angles.append(lidar_max_angle + (i * lidar_spacing))
+            # print((lidar_max_angle + (i * lidar_spacing))*180 / pi)
 
     def calculate_changes(self, autopilot):
         distances = self.get_lidar_data()
@@ -39,6 +40,9 @@ class Sensors():
                     if type(dist) is float:
                         x_vals += ((float)(autopilot[idx]) * dist * cos(angles[idx]))
                         y_vals += ((float)(autopilot[idx]) * dist * sin(angles[idx]))
+
+        # y_vals = (distances[0][0] - 40) * float(autopilot[0])
+        # print(y_vals, end='\r')
         return((x_vals, y_vals))
 
     def update_road(self, road):

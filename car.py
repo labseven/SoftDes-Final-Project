@@ -34,7 +34,7 @@ class Car():
         self.points = [(0, 0), (0, 0), (0, 0), (0, 0)]
 
         self.time_score = 0
-        self.points = 0
+        self.score = 0
 
     def update_pos(self, road):
         # F_net and T_net are inputs from keyboard or autonomous
@@ -66,6 +66,6 @@ class Car():
             return(-1)
         self.last_position_score = current_position_score
         # print(current_position_score, end='\r')
-        self.score = current_position_score + self.speed_total
+        self.score = current_position_score  # + self.speed_total
         # print(self.average_speed)
         return(self.score)

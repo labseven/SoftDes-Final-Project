@@ -1,12 +1,12 @@
 from world import World
 from view import View
 import pygame
-from math import pi
+from math import pi, atan
 import pickle
 
 FORCE = -1000
 BRAKING = -500
-steering_max = pi/2-.1
+steering_max = pi/4-.1
 INCREMENT = pi/4
 
 
@@ -64,7 +64,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
             # print(d_gas)
             world.car.driving_force = 2.5 * d_gas * FORCE
-            world.car.steering += d_steer * 20
+            world.car.steering = atan(d_steer / d_gas)
 
         if world.car.steering > steering_max:
             world.car.steering = steering_max

@@ -141,10 +141,15 @@ class View():
         # Rotate the car sprite in place
         rot_car = pygame.transform.rotate(car_sprite, 180-theta*(180/3.1416))
         new_rect = rot_car.get_rect(center=car_rect.center)  # Needed to keep car in same place
+
         new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
-
+        #width = 16, height = 32
+        # back_l
+        # front_l
+        # back_r
+        # front_r
         car.points = [new_rect.topleft, new_rect.topright, new_rect.bottomright, new_rect.bottomleft]
-
+        # print(new_rect.__str__(), car.points)
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
 

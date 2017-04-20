@@ -168,7 +168,7 @@ def evolve_autopilot():
 
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
-    pop = toolbox.population(n=20)
+    pop = toolbox.population(n=50)
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
@@ -184,7 +184,7 @@ def evolve_autopilot():
                                    toolbox,
                                    0.5,    # Prob. of crossover (mating)
                                    0.8,   # Probability of mutation
-                                   50,    # Num. of generations to run
+                                   20,    # Num. of generations to run
                                    stats,
                                    hof)
 
