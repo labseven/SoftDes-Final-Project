@@ -48,7 +48,7 @@ class View():
             self.order_array.append(row)
         self.desirability = 0
 
-    def build_obj_canvas(self, barn_pos=(500, 500), num_corn=100):
+    def build_obj_canvas(self, barn_pos=(100, 100), num_corn=100, cow_pos=(150, 150), cow_pos2=(190,100), cow_pos3=(40,80), cow_pos4=(160,50), cow_pos5=(230,150)):
         """
         Creates canvas of all static objects (corn and barn) for faster frame
         updates.
@@ -57,8 +57,17 @@ class View():
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
         barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
+        cow_surf = pygame.image.load("assets/cow.png") # Load cow gif
+        cow_surf = pygame.transform.scale(cow_surf, (50, 50))
 
         all_objs = [Sprite(barn_surf, barn_pos[0], barn_pos[1])]  # Barn object
+        all_objs.extend([Sprite(cow_surf, cow_pos[0], cow_pos[1])]) #cow object
+        all_objs.extend([Sprite(cow_surf, cow_pos2[0], cow_pos2[1])]) #cow object 2
+        all_objs.extend([Sprite(cow_surf, cow_pos3[0], cow_pos3[1])]) #cow object 3
+        all_objs.extend([Sprite(cow_surf, cow_pos4[0], cow_pos4[1])]) #cow object 4
+        all_objs.extend([Sprite(cow_surf, cow_pos5[0], cow_pos5[1])]) #cow object 5
+        # all_objs.extend([obj for obj in [Sprite(cow_surf, randint(-50, 999), randint(0, 999))
+                        # for x in range(num_cow)]])
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
                         for x in range(num_corn)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
