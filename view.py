@@ -22,6 +22,9 @@ RED = (203, 20, 16)
 
 class View():
     def __init__(self, size=(1000, 1000), map_in=None):
+        """
+            Initializes the screen and array of the world, to change when track drawn
+        """
         self.track_points = []  # List of mouse points on track
         self.bg_color = (70, 204, 63)
 
@@ -199,13 +202,15 @@ class View():
 
     def draw_buttons(self):
         """
-        Creates new button on top right corner of screen
-        Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+            Creates new button on top right corner of screen
         """
+        #Parameters:                  surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
-        # Defines what happens when button is pressed
+        """
+            Defines what happens when button is pressed
+        """
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -213,6 +218,7 @@ class View():
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size) #when pressed, contents of road matrix is cleared, aka set to 0
 
+# http://stackoverflow.com/questions/597369/how-to-create-ms-paint-clone-with-python-and-pygame
 
     def roundline(self, world, color, start, end, radius):
         self.desirability += .1
@@ -253,11 +259,22 @@ class View():
 
         world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
 
+
+# https://github.com/GGRice/InteractiveProgramming/blob/master/pong.py
+
     def text_objects(self, text, font, color):
+        """
+            Creates font of certain type, size, and color
+        """
         textSurface = font.render(text, True, color)
         return textSurface, textSurface.get_rect()
 
     def draw_start(self, size):
+        """
+            Creates star/welcome screen
+        """
+
+        #creates new screen, initializes it's colors and creates fonts
         screen1 = pygame.display.set_mode(size)
         screen1.fill(WHITE)
         pygame.font.init()
@@ -265,8 +282,10 @@ class View():
         mymedfont = pygame.font.Font('freesansbold.ttf', 40)
         mylargefont = pygame.font.Font('freesansbold.ttf', 50)
 
+        #loads image of corn
         corn_surf = pygame.image.load("assets/corn.png")
 
+        #creates text objects to be printed
         TextSurf, TextRect = self.text_objects('Corn', mylargefont, YELLOW)
         TextSurfH, TextRectH = self.text_objects('HELL', mylargefont, RED)
         TextSurf1, TextRect1 = self.text_objects('Can you survive the', myfont, YELLOW)
@@ -279,6 +298,7 @@ class View():
         TextSurf7, TextRect7 = self.text_objects('Draw track by clicking button then drawing with mouse', myfont, YELLOW)
         TextSurf8, TextRect8 = self.text_objects('Draw a track then test your skills!', myfont, YELLOW)
 
+        #determines location for each text in terms of center of screen
         TextRect.center = ((size[0]/2 - 75), (size[1]/4))
         TextRectH.center = ((size[0]/2 + 75), (size[1]/4))
         TextRect1.center = ((size[0]/2), (size[1]/2 - 200))
@@ -290,6 +310,7 @@ class View():
         TextRect8.center = ((size[0]/2), (size[1]/2)+250)
         TextRect5.center = ((size[0]/2), (size[1]/4 * 3.5))
 
+        #actually displays the text on the screen
         screen1.blit(TextSurf, TextRect)
         screen1.blit(TextSurfH, TextRectH)
         screen1.blit(TextSurf1, TextRect1)
@@ -301,11 +322,13 @@ class View():
         screen1.blit(TextSurf8, TextRect8)
         screen1.blit(TextSurf5, TextRect5)
 
+        #displays the corn in the 4 corners of the screen
         screen1.blit(corn_surf, (50, 50))
         screen1.blit(corn_surf, (50, size[1]-100))
         screen1.blit(corn_surf, (size[0]-100, 50))
         screen1.blit(corn_surf, (size[0]-100, size[1]-100))
 
+        #updates the display screen
         pygame.display.update()
 
 
