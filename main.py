@@ -28,7 +28,6 @@ def main():
     pygame.mixer.music.play(loops=-1)
 
     # Initialize sounds
-    pygame.mixer.music.stop()
     low_sound = pygame.mixer.Sound('assets/car_low.ogg')
     low_sound.set_volume(0)
     low_sound.play(loops=-1, fade_ms=100)
@@ -52,6 +51,8 @@ def main():
 
         view.draw_start(size)
 
+    # Stop the intro music
+    pygame.mixer.music.stop()
 
     # Driving screen
     while True:
