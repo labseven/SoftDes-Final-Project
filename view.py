@@ -275,13 +275,20 @@ class View():
         TextSurf4, TextRect4 = self.text_objects('Create your hell now!', mylargefont, YELLOW)
         TextSurf5, TextRect5 = self.text_objects('Press Space Bar to Start', myfont, YELLOW)
 
+        TextSurf6, TextRect6 = self.text_objects('W for forward, A for left, D for right, S for break', myfont, YELLOW)
+        TextSurf7, TextRect7 = self.text_objects('Draw track by clicking button then drawing with mouse', myfont, YELLOW)
+        TextSurf8, TextRect8 = self.text_objects('Draw a track then test your skills!', myfont, YELLOW)
+
         TextRect.center = ((size[0]/2 - 75), (size[1]/4))
         TextRectH.center = ((size[0]/2 + 75), (size[1]/4))
         TextRect1.center = ((size[0]/2), (size[1]/2 - 200))
         TextRect2.center = ((size[0]/2), (size[1]/2 - 150))
         TextRect3.center = ((size[0]/2), (size[1]/2 - 100))
         TextRect4.center = ((size[0]/2), (size[1]/2))
-        TextRect5.center = ((size[0]/2), (size[1]/4 * 3))
+        TextRect6.center = ((size[0]/2), (size[1]/2)+150)
+        TextRect7.center = ((size[0]/2), (size[1]/2)+200)
+        TextRect8.center = ((size[0]/2), (size[1]/2)+250)
+        TextRect5.center = ((size[0]/2), (size[1]/4 * 3.5))
 
         screen1.blit(TextSurf, TextRect)
         screen1.blit(TextSurfH, TextRectH)
@@ -289,12 +296,10 @@ class View():
         screen1.blit(TextSurf2, TextRect2)
         screen1.blit(TextSurf3, TextRect3)
         screen1.blit(TextSurf4, TextRect4)
+        screen1.blit(TextSurf6, TextRect6)
+        screen1.blit(TextSurf7, TextRect7)
+        screen1.blit(TextSurf8, TextRect8)
         screen1.blit(TextSurf5, TextRect5)
-
-        screen1.blit(corn_surf, (50, 50))
-        screen1.blit(corn_surf, (50, size[1]-100))
-        screen1.blit(corn_surf, (size[0]-100, 50))
-        screen1.blit(corn_surf, (size[0]-100, size[1]-100))
 
         pygame.display.update()
 
