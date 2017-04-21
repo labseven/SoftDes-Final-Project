@@ -3,6 +3,7 @@ from view import View
 import pygame
 from math import pi, atan
 import pickle
+import numpy as np
 
 FORCE = -1000
 BRAKING = -500
@@ -73,28 +74,32 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
         world.car.update_pos(world.road)
 
-        hold = world.car.update_score(world.reward_matrix)
+        hold, position_score = world.car.update_score(world.reward_matrix)
         if hold == -1:
             # print('WENT DOWN IN VALUE:', score)
             reset_car(world)
             if world.car.time_score < 50:
                 return 0
+            elif position_score <= .01:
+                score += 1000
             return score
         else:
             score = hold
         # print(score, end='\r')
-        if world.car.time_score > 300:
-            # print('TIMED OUT')
-            return 0
+        if world.car.time_score > 60 and position_score < 1:
+            if np.all(world.reward_matrix == 0):
+                pass
+            else:
+                return 0
         if world.detect_crash():  # If the car has crashed, reset it
             reset_car(world)
 
             # print('FINAL SCORE:', score)
-            if score == 9.61:
+            if position_score == world.reward_matrix.max and world.car.time_score < 50:
                 score = 0
             return score
-
-        clock.tick(60)
+        # print(world.car.time_score, score)
+        # clock.tick(60)
 
 
 def reset_car(world):
