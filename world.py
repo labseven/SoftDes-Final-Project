@@ -21,7 +21,7 @@ class World_Map():
 
 
 class World():
-    def __init__(self, size=(1000, 1000)):
+    def __init__(self, size=(1000, 1000), map_name='None'):
         """
         Initializes the numpy matrix for the road and creates a car.
         """

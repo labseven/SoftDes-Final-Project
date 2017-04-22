@@ -105,6 +105,6 @@ class Car():
             return(-1, self.current_position_score)
         self.last_position_score = self.current_position_score
         # print(current_position_score, end='\r')
-        self.score = self.current_position_score + self.speed_total/1000
+        self.score = self.current_position_score # self.speed_total/1000
         # print(self.average_speed)
         return(self.score, self.current_position_score)

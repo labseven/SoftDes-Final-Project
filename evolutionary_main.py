@@ -11,7 +11,7 @@ steering_max = pi/4-.1
 INCREMENT = pi/4
 
 
-def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]):
+def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], map_name="None"):
     # print(autopilot)
     size = (1000, 1000)
     world = World(size)
@@ -55,7 +55,6 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
         else:
             # Of the form (turn, accelerator)
-            # print('k')
             d_steer, d_gas = world.car.sensors.calculate_changes(autopilot)
 
             if d_gas > 1:
@@ -78,14 +77,14 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
         if hold == -1:
             # print('WENT DOWN IN VALUE:', score)
             reset_car(world)
-            if world.car.time_score < 50:
+            if world.car.time_score < 150:
                 return 0
-            elif position_score <= .01:
-                score += 1000
+            elif position_score <= .01 and world.car.speed_total > 10000:
+                score += world.car.average_speed
             return score
         else:
             score = hold
-        # print(score, end='\r')
+
         if world.car.time_score > 60 and position_score < 1:
             if np.all(world.reward_matrix == 0):
                 pass
@@ -95,11 +94,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             reset_car(world)
 
             # print('FINAL SCORE:', score)
-            if position_score == world.reward_matrix.max and world.car.time_score < 50:
+            if position_score == world.reward_matrix.max() and world.car.time_score < 50:
                 score = 0
             return score
-        # print(world.car.time_score, score)
-        # clock.tick(60)
 
 
 def reset_car(world):
