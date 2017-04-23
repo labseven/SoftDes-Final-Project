@@ -9,7 +9,9 @@ import numpy as np
 from random import randint
 from collections import namedtuple
 import math
-
+#############################################
+# GLOBAL VARIABLES
+#############################################
 Sprite = namedtuple('Sprite', 'surf x y')
 ROAD_COLOR = (150, 115, 33)
 BG_COLOR = (70, 204, 63)
@@ -21,42 +23,42 @@ RED = (203, 20, 16)
 
 
 class View():
+    """
+    Handles all drawing and interaction which occurs on the screen. Completely decoupled from the
+    actual functionality of the car and map, so as to facilitate faster evolution.
+    """
     def __init__(self, size=(1000, 1000), map_in=None):
-
+        """
+        Initializes window based on size and which map to display. See documentation
+        for valid map names.
+        """
         self.track_points = []  # List of mouse points on track
-        self.bg_color = (70, 204, 63)
-
+        self.bg_color = (70, 204, 63)  # background color
         self.size = size
-
         self.world = map_in
+
         self.screen = pygame.display.set_mode(size)
-        self.draw_on = False
-        # self.objs = self.build_obj_canvas()
-        self.road_mask = self.get_road_surface(self.world.road)
+        self.objs = self.build_obj_canvas()  # list containing all the sprite-objects to be drawn
+        self.road_mask = self.get_road_surface(self.world.road)  # Matrix holding color values
 
         self.Button1 = Buttons.Button()
-        self.ready_to_draw = False
 
-        self.order_array_size = 100
-        self.order_array = []
-        for h in range(self.order_array_size):
-            row = []
-            for w in range(self.order_array_size):
-                row.append(-10)
-            self.order_array.append(row)
-        self.desirability = 0
+        self.ready_to_draw = False  # Boolean determining if the draw button has been clicked
+        self.draw_on = False  # Boolean controlling user drawing on the canvas
 
-    def build_obj_canvas(self, barn_pos=(500, 500), num_corn=100):
-        # Build transparent surface
+    def build_obj_canvas(self, barn_pos=(50, 100), num_corn=100):
+        """Build transparent surface containing all sprite-objects"""
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
         barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
 
         all_objs = [Sprite(barn_surf, barn_pos[0], barn_pos[1])]  # Barn object
+        # Generates corn positions randomly and populates objects, avoiding the road
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
                         for x in range(num_corn)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
-                        -50 <= obj.y-all_objs[0].y <= 50)])
+                                 -50 <= obj.y-all_objs[0].y <= 50)])
+        # compiles
         obj_surfaces = self.draw_decorations(all_objs, obj_surfaces)
 
         return obj_surfaces
@@ -73,10 +75,10 @@ class View():
         self.process_draw_events(world, events, radius, color)  # Handle drawing stuff
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
         if world.car.visible:
-            self.draw_car(world.car)  # Draw on car
+            self.draw_car(world.car)  # Draw on car, and by extension lidar
             for checkpoint in world.checkpoints:
                 pygame.draw.rect(self.screen, (255, 255, 255), (checkpoint[0], checkpoint[1], 10, 10), 0)
-        # self.screen.blit(self.objs, (0, 0))
+        self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
 
@@ -96,6 +98,7 @@ class View():
 
             if e.type == pygame.MOUSEBUTTONUP:
                 x, y = e.pos
+                # bounds of the upper right button, hacky solution but time was short
                 if x > 690 and x < 990 and y > 10 and y < 60:  # If button is pressed and released
                     self.draw_on = False  # Make sure we already aren't drawing
                     self.ready_to_draw = True  # Make it possible to draw
@@ -103,7 +106,7 @@ class View():
 
                 elif self.draw_on:  # If the mouse was lifted up after drawing
                     self.draw_on = False
-                    self.objs = self.build_obj_canvas()
+                    self.objs = self.build_obj_canvas()  # rebuild sprites to avoid road
                     world.car_start_angle = get_start_angle(world.track_points)
                     world.reset_car()  # Reset the car, the track has been re-drawn
                     world.car.visible = True
@@ -111,7 +114,7 @@ class View():
 
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
-                    world.track_points.append(e.pos)
+                    world.track_points.append(e.pos)  # adds position of mouse to checkpoint list
                     self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
     def get_road_surface(self, road):
@@ -132,7 +135,7 @@ class View():
         """
 
         x_pos, y_pos = car.position  # Get car position, angle
-        theta = -car.angle[0]
+        theta = -car.angle[0]  # To account for the switch of angular direction in physics
 
         car_sprite = pygame.image.load("assets/car.png")  # Load car sprite
         # Scale the car sprite to be the correct size
@@ -143,10 +146,7 @@ class View():
         rot_car = pygame.transform.rotate(car_sprite, 180-theta*(180/3.1416))
         new_rect = rot_car.get_rect(center=car_rect.center)  # Needed to keep car in same place
         new_rect.topleft = (new_rect.topleft[0] + x_pos, new_rect.topright[1] + y_pos)
-        
-        #print(car.points)
 
-        # print(new_rect.__str__(), car.points)
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
 
@@ -154,7 +154,8 @@ class View():
         """
         Draws lidar beams
         """
-        pygame.draw.polygon(self.screen, WHITE, car.points)
+        # NOTE: Enable to draw the car's hitbox in white
+        # pygame.draw.polygon(self.screen, WHITE, car.points)
 
         for hit in car.lidar_hits:
             pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), hit)
@@ -180,11 +181,10 @@ class View():
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
-                    self.world.road = np.zeros(self.size) #when pressed, contents of road matrix is cleared, aka set to 0
-                    self.road_mask = self.get_road_surface(self.world.road) #rerenders the road picture on the screen so it is clear fo road
+                    self.world.road = np.zeros(self.size)  # when pressed, contents of road matrix is cleared, aka set to 0
+                    self.road_mask = self.get_road_surface(self.world.road)  # re-renders the road picture on the screen so it is clear of road
 
     def roundline(self, world, color, start, end, radius):
-        self.desirability += .1
         """
         Draws a round line from one point to another and updates the road matrix
         """
@@ -212,30 +212,33 @@ class View():
             width = right_val - left_val
             height = bottom_val - top_val
             world.road[left_val:right_val, top_val:bottom_val] += pix_array[:width, :height]
-            x_int = (int)(x / 10)
-            y_int = (int)(y / 10)
-            num = self.order_array[y_int][x_int]
-            if num < 0:
-                self.order_array[y_int][x_int] = self.desirability
+
             # Draws the circle on the surface of the road
             pygame.draw.circle(self.road_mask, (150, 115, 33), (x, y), int(radius/2), 0)
 
-        world.road[world.road > 0] = 255  # This fixes weird LIDAR issues (I don't really know why)
+        world.road[world.road > 0] = 255  # This fixes issues with LIDAR drawings
 
     def text_objects(self, text, font, color):
+        """Helper function for draw_start"""
         textSurface = font.render(text, True, color)
         return textSurface, textSurface.get_rect()
 
     def draw_start(self, size):
+        """Creates the classic start screen"""
+        # Opens duplicate window and fills the background in white
         screen1 = pygame.display.set_mode(size)
         screen1.fill(WHITE)
+
+        # Initializes font used in start screen
         pygame.font.init()
         myfont = pygame.font.Font('freesansbold.ttf', 30)
         mymedfont = pygame.font.Font('freesansbold.ttf', 40)
         mylargefont = pygame.font.Font('freesansbold.ttf', 50)
 
+        # Loads assets
         corn_surf = pygame.image.load("assets/corn.png")
 
+        # Creates text objects
         TextSurf, TextRect = self.text_objects('Corn', mylargefont, YELLOW)
         TextSurfH, TextRectH = self.text_objects('HELL', mylargefont, RED)
         TextSurf1, TextRect1 = self.text_objects('Can you survive the', myfont, YELLOW)
@@ -244,6 +247,7 @@ class View():
         TextSurf4, TextRect4 = self.text_objects('Create your hell now!', mylargefont, YELLOW)
         TextSurf5, TextRect5 = self.text_objects('Press Space Bar to Start', myfont, YELLOW)
 
+        # Places Text on the screen
         TextRect.center = ((size[0]/2 - 75), (size[1]/4))
         TextRectH.center = ((size[0]/2 + 75), (size[1]/4))
         TextRect1.center = ((size[0]/2), (size[1]/2 - 200))
@@ -260,6 +264,7 @@ class View():
         screen1.blit(TextSurf4, TextRect4)
         screen1.blit(TextSurf5, TextRect5)
 
+        # Places images on screen
         screen1.blit(corn_surf, (50, 50))
         screen1.blit(corn_surf, (50, size[1]-100))
         screen1.blit(corn_surf, (size[0]-100, 50))
@@ -282,7 +287,9 @@ def get_start_angle(pos_list):
     mouse_vel = (pos_final[0] - pos_init[0], pos_init[1] - pos_final[1])  # Flipped Y values because of display/matrix difference
     return math.atan2(mouse_vel[1], mouse_vel[0])-(math.pi/2)
 
-
+# -----------------------------------------------------------------------------
+# Run if called from the command line
+# -----------------------------------------------------------------------------
 if __name__ == "__main__":
     view = View()
     view.draw_scene()

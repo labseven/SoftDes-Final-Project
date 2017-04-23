@@ -41,8 +41,6 @@ class Sensors():
                         x_vals += ((float)(autopilot[idx]) * dist * cos(angles[idx]))
                         y_vals += ((float)(autopilot[idx]) * dist * sin(angles[idx]))
 
-        # y_vals = (distances[0][0] - 40) * float(autopilot[0])
-        # print(y_vals, end='\r')
         return((x_vals, y_vals))
 
     def update_road(self, road):
