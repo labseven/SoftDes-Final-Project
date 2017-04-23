@@ -18,19 +18,19 @@ from deap import base
 from deap import tools
 import evolutionary_main
 import tkinter as tk
-from tkinter import *
 import pickle
 
 # -----------------------------------------------------------------------------
 #  Global variables
 # -----------------------------------------------------------------------------
-MAP_NAME = 'Chris_Track'
+MAP_NAME = 'Clover_track'
 
 
 VALID_COEFF = numpy.arange(-1, 1.1, 0.1)
 # Control whether all Autopilots are printed as they are evaluated
 VERBOSE = False
 
+# Dictionary for memoization
 d = {}
 # ----------------------------------------------------------------------------
 # Autopilot object to use in evolutionary algorithm
@@ -49,7 +49,7 @@ class Autopilot(list):
     """
     Representation of an individual Autopilot within the population to be evolved
 
-    We represent the Autopilot as a list of coefficients (mutable) so it can
+    represent the Autopilot as a list of coefficients (mutable) so it can
     be more easily manipulated by the genetic operators.
     """
     def __init__(self, initial_vals=-2):
@@ -57,14 +57,13 @@ class Autopilot(list):
         Create a new Autopilot individual.
 
         If starting_string is given, initialize the Autopilot with the
-        provided string message. Otherwise, initialize to a random string
+        provided string message. Otherwise if -2, initialize to a random string
         message with length between min_length and max_length.
         """
         # Want to minimize a single objective: distance from the goal message
         self.fitness = FitnessMaximizeSingle()
 
-        # populate Autopilot with 20 random characters
-        # print(initial_vals)
+        # populate Autopilot with 20 random characters as long as no  precedent exists
         if initial_vals is not -2:
             self.extend(initial_vals)
         else:
@@ -83,22 +82,28 @@ class Autopilot(list):
                                val=self.get_text())
 
     def get_text(self):
-        """Return Autopilot as string (rather than actual list of chars)"""
+        """Return Autopilot as string, accounting for float vs integer quantities"""
         string = ''
         length = len(self)
         for i, coef in enumerate(self):
+            # if self is the first in the list
             if i == 0:
                 try:
+                    # only works if coef is not float
                     string += '\n(' + str(coef) + ', '
                 except(TypeError):
+                    # truncates value should coeficient be a float and in the beginning of a string
                     string += '\n(' + coef.astype('|S10') + ', '
             elif i == length - 1:
+                # string at the end of the list of coefficients
                 try:
                     string += str(coef) + ')'
                 except(TypeError):
+                    # or float
                     string += coef.astype('|S10') + ')'
             else:
                 try:
+                    # truncates value should coeficient be a float and in the middle of a string
                     string += str(coef) + ', '
                 except(TypeError):
                     string += coef.astype('|S10') + ')'
@@ -112,24 +117,27 @@ class Autopilot(list):
 
 def evaluate_driving(message, draw=False, verbose=VERBOSE, map_name=MAP_NAME, memoize=True):
     """
-    Given a Autopilot and a goal_text string, return the Levenshtein distance
-    between the Autopilot and the goal_text as a length 1 tuple.
-    If verbose is True, print each Autopilot as it is evaluated.
+    Given a Autopilot and a map, return the  distance The autopilot makes
+    as a length 1 tuple. If verbose is True, print each Autopilot as it is evaluated.
     """
-    # print('.'),
+    # memoiziation
     mem = False
     if memoize:
+        # disabled for the show of runnning multiple autopilots on different maps
         try:
             distance = d[message.get_text()]
             mem = True
         except(KeyError):
+            # only happens of memoization is off or if autopilot is not in existing list
             distance = evolutionary_main.main(draw, False, message, map_name)
             d[message.get_text()] = distance
     else:
+        # if memoization is not active, run as normal
+        # FORMAT IS  draw (boolean), Control (Boolean), message (Autopilot), map_name (String)
         distance = evolutionary_main.main(draw, False, message, map_name)
-    # print(mem)
+        # pickle to save each autopilot as its run
     file_object = open('Pilots.txt', 'a')
-    file_object.write('\n' + (str)(distance) + str(mem) + ':' + message.get_text())
+    file_object.write('\n\n' + (str)(distance) + '\t' + str(mem) + '\t' + map_name + ':' + message.get_text())
     file_object.close()
 
     if verbose:
@@ -146,16 +154,12 @@ def mutate_autopilots(coefficients, prob_sub=0.05):
         Substitution:   Replace one coefficients of the Autopilot with a random
                         (legal) coefficient
 
-    >>> mutate_autopilots('hello', 1, 1, 1)
     """
     coefficients = list(coefficients)
 
     if random.random() < prob_sub:
         index = random.randint(0, len(coefficients) - 1)
         coefficients[index] = random.choice(VALID_COEFF)
-
-    # message = ''.join(coefficients)
-    # print('mutated: ', message)
 
     return(Autopilot(coefficients), )   # Length 1 tuple, required by DEAP
 
@@ -199,7 +203,7 @@ def evolve_autopilot():
     # Get configured toolbox and create a population of random Autopilots
     toolbox = get_toolbox()
 
-    pop = toolbox.population(n=200)
+    pop = toolbox.population(n=300)
     # Collect statistics as the EA runs
     stats = tools.Statistics(lambda ind: ind.fitness.values)
     stats.register("avg", numpy.mean)
@@ -214,13 +218,13 @@ def evolve_autopilot():
                                    toolbox,
                                    0.5,    # Prob. of crossover (mating)
                                    0.8,   # Probability of mutation
-                                   100,    # Num. of generations to run
+                                   200,    # Num. of generations to run
                                    stats,
                                    hof)
 
     print(hof)
 
-    return pop, log
+    return pop, log, hof
 
 
 def create_window(to_return):
@@ -289,7 +293,7 @@ def create_window(to_return):
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
     while True:
-        map_to_use = 'test'
+        # map_to_use = 'test'
         """ WINNERS: CIRCLE TRACK"""
         # print(evaluate_driving(Autopilot((-0.6, -0.6, 0.4, 0, -0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6)), True))  # 0.3, -0.3, 0.8, -0.7, 0.2, -0.7, 0.4, -0.2, 0.9, 0.9, 0.7, 0.8, -2.22044604925e-16, 0.4, -0.1, -0.5, 0.2, -0.5, 0.4, -0.2, -2.22044604925e-16, 0.2, 0.2, 0.6, 0.3, 0.9, -2.22044604925e-16, 0.9, 0.4, 0.5, 0.9, 0.4, -0.3, -0.5, 0.1, -0.3, -2.22044604925e-16, -2.22044604925e-16, -0.4, -0.5, 0.6, 0.8, -0.8, 0.7, -0.7, 0.6, 0.7, 0.5, -0.2, -0.3, -2.22044604925e-16, -0.3, -0.3, 0.2, 0.9, 0.6, -0.7, -0.4, 0.7, 0.6, -2.22044604925e-16, 0.8, 0.7, -0.6, 0.1, -0.7, -0.1, 0.3, -2.22044604925e-16, 0.1, -0.5, -0.3, 1.0, 0.6, 0.2, -1.0, 0.3, -0.7, 0.1, 0.5, 0.8, -0.6, 0.3, -0.3, -1.0, -1.0, 0.3, -0.5, 1.0, 0.7, 0.6, 0.5, -0.6, 0.7, 0.7, 0.2, -0.3, -1.0, 0.7, -1.0, -0.6, 0.8, 0.4, 0.5, -0.4, -0.5, -0.9, 0.7, -0.4, -0.3, 0.1, 0.5, 0.3, 0.5, -2.22044604925e-16, -0.7, -1.0, 0.9, 1.0, 1.0, 0.2, -0.4, 0.7, 0.7, -0.8, 1.0, -0.3, -0.4, -0.4, 0.6, 0.7, 0.7, 0.2, -0.2, 0.7, 0.2, -0.7, 0.9, -0.4, -0.6, 1.0, 0.2, -0.6, 1.0, 0.6, -0.1, -0.6, 0.7, 0.6, -1.0, -0.1, 0.5, 0.4, -0.3, -0.8, -0.3, 0.1, -0.7, 1.0, -0.8, -0.4, -1.0, 0.3, -0.1, 0.1, -0.7, -0.4, -0.4, -2.22044604925e-16, 0.4, -0.4, 0.3, -0.1, -0.8, 0.3, -0.1, 0.9, -0.3, -0.7, -2.22044604925e-16, -0.8, 0.6, -0.5, -1.0, 0.2, -0.2, -0.5, 0.5, -0.2, 0.8, -0.6, 0.4, -2.22044604925e-16, 0.5, -0.8, 0.9, -0.1, 0.8, 0.2, 0.8, -0.2, -0.5, -0.9, 1.0, -0.7, -0.7, 0.9, -0.5, 0.1, 0.6, -0.4, -2.22044604925e-16, 0.1, -0.5, 0.6, -0.8, -0.7, 0.3, -0.5, -1.0, -0.6, -0.5, -0.4, -0.4, 0.4, -0.3, 0.2, 0.4, -0.9, 1.0, -0.8, 0.6, -0.4, 0.2, -0.5, -1.0, -0.5, -1.0, -0.4, -0.5)))
         # print(evaluate_driving(Autopilot((0.3, -0.6, 0.4, -0.5, 0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6, 0.3)), True))
@@ -301,11 +305,14 @@ if __name__ == "__main__":
         # # print(evaluate_driving(Autopilot((-0.7, 0.8, 0.3, -0.7, -0.6, -0.9, 0.2, 0.6, -0.9, -0.7, -0.4, -0.2, 0.1, 0.9, -0.7, -0.3, -0.9, -0.9, 0.1, 0.5)), True))
         # """WINNERS: CLOVER TRACK"""
 
-        create_window(map_to_use)
-        map_to_use = pickle.load(open("map_name.p", "rb"))
+        # create_window(map_to_use)
+        # map_to_use = pickle.load(open("map_name.p", "rb"))
 
-        print(evaluate_driving(Autopilot((0.9, -1.0, -0.6, 0.9, 0.7, -0.2, 0.6, -0.6, 0.2, 0.5, 0.9, 0.5, -0.2, -2.22044604925e-16, -0.9, 1.0, -0.1, 0.1, 1.0, -0.3)), True, map_name=map_to_use, memoize=False))
+        # print(evaluate_driving(Autopilot((0.9, -1.0, -0.6, 0.9, 0.7, -0.2, 0.6, -0.6, 0.2, 0.5, 0.9, 0.5, -0.2, -2.22044604925e-16, -0.9, 1.0, -0.1, 0.1, 1.0, -0.3)), True, map_name=map_to_use, memoize=False))
         # print(evaluate_driving(Autopilot((-0.5, -0.2, 0.3, -0.1, -0.5, -0.9, 1.0, 0.3, 0.1, -0.9, -0.1, -0.7, 0.9, 0.2, -0.7, 0.7, -0.4, 0.8, 0.5, 1.0)), True))
         # print(evaluate_driving(Autopilot((0.1, -1.0, -0.6, 0.8, 0.1, 0.4, -0.6, -0.3, -0.6, -0.4, -0.7, 0.8, -0.4, -0.2, 0.5, 0.6, -0.5, 0.1, -0.1, 0.2)), True))
 
-        # pop, log = evolve_autopilot()
+        pop, log, hof = evolve_autopilot()
+        file_object = open('BoTb.txt', 'a')
+        file_object.write(str(hof))
+        file_object.close()

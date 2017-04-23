@@ -107,13 +107,14 @@ def reset_car(world, map_name="NONE"):
         else:
             file_add = ''
         temp_position, temp_angle = pickle.load(open(file_add + "pos_ang.p", "rb"))
-        print(temp_position)
+        # print(temp_position)
 
         world.car_start_pos = temp_position
         world.car_start_angle = temp_angle
         world.reset_car()
     except:
-        print('Reset Failed. Draw New Track')
+        # print('Reset Failed. Draw New Track')
+        pass
 
 
 def get_events():
