@@ -18,6 +18,7 @@ from deap import base
 from deap import tools
 import evolutionary_main
 import tkinter as tk
+from tkinter import *
 import pickle
 
 # -----------------------------------------------------------------------------
@@ -254,8 +255,14 @@ def create_window(to_return):
         toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
 
     root = tk.Tk()
-    root.title("Choose Your Map")
-    center(root)
+
+    T = Text(root, height=2, width=55)
+
+    T.tag_configure("center", justify='center')
+    T.insert(END, "The Simulation will run with pre-existing Autopilots.\nSelect which map they're run on!\n")
+    T.tag_add("center", "1.0", "end")
+
+    T.pack()
     # window = tk.Toplevel(root)
     b1 = tk.Button(root, text="Circle")
     b1.pack()
@@ -265,6 +272,11 @@ def create_window(to_return):
     b3.pack()
     b4 = tk.Button(root, text="Tri-Clover")
     b4.pack()
+    back = tk.Frame(master=root, width=255, height=45)
+    back.pack()
+
+    root.title("Choose Your Map")
+    center(root)
 
     b1.bind("<Button-1>", button1)
     b2.bind("<Button-1>", button2)
