@@ -5,7 +5,6 @@ Holds the map.
 from car import Car
 # import scipy.ndimage as misc
 from random import randint
-from math import pi
 import pickle
 import numpy as np
 
@@ -21,7 +20,7 @@ class World_Map():
 
 
 class World():
-    def __init__(self, size=(1000, 1000), map_name='None'):
+    def __init__(self, size=(1000, 1000), map_name='NONE'):
         """
         Initializes the numpy matrix for the road and creates a car.
         """
@@ -38,9 +37,13 @@ class World():
 
         try:
             # print('Updated Road and reward files')
-            self.road = pickle.load(open("road.p", "rb"))
-            self.reward_matrix = pickle.load(open("reward.p", "rb"))
-            self.car_start_position, self.car_start_angle = pickle.load(open("pos_ang.p", "rb"))
+            if map_name is not 'NONE':
+                file_add = map_name + '/'
+            else:
+                file_add = ''
+            self.road = pickle.load(open(file_add + "road.p", "rb"))
+            self.reward_matrix = pickle.load(open(file_add + "reward.p", "rb"))
+            self.car_start_position, self.car_start_angle = pickle.load(open(file_add + "pos_ang.p", "rb"))
         except:
             print('Pickle Files Not Found.')
 

@@ -17,10 +17,14 @@ from deap import algorithms
 from deap import base
 from deap import tools
 import evolutionary_main
+import tkinter as tk
+import pickle
 
 # -----------------------------------------------------------------------------
 #  Global variables
 # -----------------------------------------------------------------------------
+MAP_NAME = 'Chris_Track'
+
 
 VALID_COEFF = numpy.arange(-1, 1.1, 0.1)
 # Control whether all Autopilots are printed as they are evaluated
@@ -105,7 +109,7 @@ class Autopilot(list):
 # -----------------------------------------------------------------------------
 
 
-def evaluate_driving(message, draw=False, verbose=VERBOSE):
+def evaluate_driving(message, draw=False, verbose=VERBOSE, map_name=MAP_NAME, memoize=True):
     """
     Given a Autopilot and a goal_text string, return the Levenshtein distance
     between the Autopilot and the goal_text as a length 1 tuple.
@@ -113,12 +117,15 @@ def evaluate_driving(message, draw=False, verbose=VERBOSE):
     """
     # print('.'),
     mem = False
-    try:
-        distance = d[message.get_text()]
-        mem = True
-    except(KeyError):
-        distance = evolutionary_main.main(draw, False, message)
-        d[message.get_text()] = distance
+    if memoize:
+        try:
+            distance = d[message.get_text()]
+            mem = True
+        except(KeyError):
+            distance = evolutionary_main.main(draw, False, message, map_name)
+            d[message.get_text()] = distance
+    else:
+        distance = evolutionary_main.main(draw, False, message, map_name)
     # print(mem)
     file_object = open('Pilots.txt', 'a')
     file_object.write('\n' + (str)(distance) + str(mem) + ':' + message.get_text())
@@ -211,26 +218,82 @@ def evolve_autopilot():
                                    hof)
 
     print(hof)
+
     return pop, log
 
+
+def create_window(to_return):
+
+    def button1(event):
+        to_return = 'Circle_Track'
+        pickle.dump(to_return, open('map_name.p', 'wb'))
+        root.destroy()
+
+    def button2(event):
+        to_return = 'Clover_track'
+        pickle.dump(to_return, open('map_name.p', 'wb'))
+        root.destroy()
+
+    def button3(event):
+        to_return = 'Chris_Track'
+        pickle.dump(to_return, open('map_name.p', 'wb'))
+        root.destroy()
+
+    def button4(event):
+        to_return = "Tri-Clover"
+        pickle.dump(to_return, open('map_name.p', 'wb'))
+        root.destroy()
+
+    def center(toplevel):
+        toplevel.update_idletasks()
+        w = toplevel.winfo_screenwidth()
+        h = toplevel.winfo_screenheight()
+        size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+        x = w/2 - size[0]/2
+        y = h/2 - size[1]/2
+        toplevel.geometry("%dx%d+%d+%d" % (size + (x, y)))
+
+    root = tk.Tk()
+    root.title("Choose Your Map")
+    center(root)
+    # window = tk.Toplevel(root)
+    b1 = tk.Button(root, text="Circle")
+    b1.pack()
+    b2 = tk.Button(root, text="Four-Leafed Clover")
+    b2.pack()
+    b3 = tk.Button(root, text="C-Shape")
+    b3.pack()
+    b4 = tk.Button(root, text="Tri-Clover")
+    b4.pack()
+
+    b1.bind("<Button-1>", button1)
+    b2.bind("<Button-1>", button2)
+    b3.bind("<Button-1>", button3)
+    b4.bind("<Button-1>", button4)
+    root.mainloop()
 
 # -----------------------------------------------------------------------------
 # Run if called from the command line
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
+    while True:
+        map_to_use = 'test'
+        """ WINNERS: CIRCLE TRACK"""
+        # print(evaluate_driving(Autopilot((-0.6, -0.6, 0.4, 0, -0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6)), True))  # 0.3, -0.3, 0.8, -0.7, 0.2, -0.7, 0.4, -0.2, 0.9, 0.9, 0.7, 0.8, -2.22044604925e-16, 0.4, -0.1, -0.5, 0.2, -0.5, 0.4, -0.2, -2.22044604925e-16, 0.2, 0.2, 0.6, 0.3, 0.9, -2.22044604925e-16, 0.9, 0.4, 0.5, 0.9, 0.4, -0.3, -0.5, 0.1, -0.3, -2.22044604925e-16, -2.22044604925e-16, -0.4, -0.5, 0.6, 0.8, -0.8, 0.7, -0.7, 0.6, 0.7, 0.5, -0.2, -0.3, -2.22044604925e-16, -0.3, -0.3, 0.2, 0.9, 0.6, -0.7, -0.4, 0.7, 0.6, -2.22044604925e-16, 0.8, 0.7, -0.6, 0.1, -0.7, -0.1, 0.3, -2.22044604925e-16, 0.1, -0.5, -0.3, 1.0, 0.6, 0.2, -1.0, 0.3, -0.7, 0.1, 0.5, 0.8, -0.6, 0.3, -0.3, -1.0, -1.0, 0.3, -0.5, 1.0, 0.7, 0.6, 0.5, -0.6, 0.7, 0.7, 0.2, -0.3, -1.0, 0.7, -1.0, -0.6, 0.8, 0.4, 0.5, -0.4, -0.5, -0.9, 0.7, -0.4, -0.3, 0.1, 0.5, 0.3, 0.5, -2.22044604925e-16, -0.7, -1.0, 0.9, 1.0, 1.0, 0.2, -0.4, 0.7, 0.7, -0.8, 1.0, -0.3, -0.4, -0.4, 0.6, 0.7, 0.7, 0.2, -0.2, 0.7, 0.2, -0.7, 0.9, -0.4, -0.6, 1.0, 0.2, -0.6, 1.0, 0.6, -0.1, -0.6, 0.7, 0.6, -1.0, -0.1, 0.5, 0.4, -0.3, -0.8, -0.3, 0.1, -0.7, 1.0, -0.8, -0.4, -1.0, 0.3, -0.1, 0.1, -0.7, -0.4, -0.4, -2.22044604925e-16, 0.4, -0.4, 0.3, -0.1, -0.8, 0.3, -0.1, 0.9, -0.3, -0.7, -2.22044604925e-16, -0.8, 0.6, -0.5, -1.0, 0.2, -0.2, -0.5, 0.5, -0.2, 0.8, -0.6, 0.4, -2.22044604925e-16, 0.5, -0.8, 0.9, -0.1, 0.8, 0.2, 0.8, -0.2, -0.5, -0.9, 1.0, -0.7, -0.7, 0.9, -0.5, 0.1, 0.6, -0.4, -2.22044604925e-16, 0.1, -0.5, 0.6, -0.8, -0.7, 0.3, -0.5, -1.0, -0.6, -0.5, -0.4, -0.4, 0.4, -0.3, 0.2, 0.4, -0.9, 1.0, -0.8, 0.6, -0.4, 0.2, -0.5, -1.0, -0.5, -1.0, -0.4, -0.5)))
+        # print(evaluate_driving(Autopilot((0.3, -0.6, 0.4, -0.5, 0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6, 0.3)), True))
+        #"""WINNERS: Chris Track"""
+        # print(evaluate_driving(Autopilot((-0.5, 0.8, -0.5, -0.4, -0.3, -0.6, -0.2, 0.4, -2.22044604925e-16, -0.9, -1.0, -0.6, 0.2, 0.5, -1.0, -2.22044604925e-16, 0.8, -0.8, -0.7, 0.5)), True))
+        # print(evaluate_driving(Autopilot((0.3, -1.0, -0.5, 0.8, -0.3, 0.3, 0.5, -0.6, 0.4, -0.4, 0.2, -0.2, 0.7, 0.5, -1.0, -2.22044604925e-16, -0.9, 1.0, -0.3, -0.9)), True))
+        # """FOR SPEED"""
+        # # print(evaluate_driving(Autopilot((0.6, 0.4, -0.1, -0.3, -0.5, 0.5, -0.5, 0.8, -0.7, -0.8, -0.2, -0.7, -0.3, 1.0, 0.3, -0.7, -0.9, -0.4, 1.0, -1.0)), True))
+        # # print(evaluate_driving(Autopilot((-0.7, 0.8, 0.3, -0.7, -0.6, -0.9, 0.2, 0.6, -0.9, -0.7, -0.4, -0.2, 0.1, 0.9, -0.7, -0.3, -0.9, -0.9, 0.1, 0.5)), True))
+        # """WINNERS: CLOVER TRACK"""
 
-    """ WINNERS: CIRCLE TRACK"""
-    # print(evaluate_driving(Autopilot((-0.6, -0.6, 0.4, 0, -0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6)), True))  # 0.3, -0.3, 0.8, -0.7, 0.2, -0.7, 0.4, -0.2, 0.9, 0.9, 0.7, 0.8, -2.22044604925e-16, 0.4, -0.1, -0.5, 0.2, -0.5, 0.4, -0.2, -2.22044604925e-16, 0.2, 0.2, 0.6, 0.3, 0.9, -2.22044604925e-16, 0.9, 0.4, 0.5, 0.9, 0.4, -0.3, -0.5, 0.1, -0.3, -2.22044604925e-16, -2.22044604925e-16, -0.4, -0.5, 0.6, 0.8, -0.8, 0.7, -0.7, 0.6, 0.7, 0.5, -0.2, -0.3, -2.22044604925e-16, -0.3, -0.3, 0.2, 0.9, 0.6, -0.7, -0.4, 0.7, 0.6, -2.22044604925e-16, 0.8, 0.7, -0.6, 0.1, -0.7, -0.1, 0.3, -2.22044604925e-16, 0.1, -0.5, -0.3, 1.0, 0.6, 0.2, -1.0, 0.3, -0.7, 0.1, 0.5, 0.8, -0.6, 0.3, -0.3, -1.0, -1.0, 0.3, -0.5, 1.0, 0.7, 0.6, 0.5, -0.6, 0.7, 0.7, 0.2, -0.3, -1.0, 0.7, -1.0, -0.6, 0.8, 0.4, 0.5, -0.4, -0.5, -0.9, 0.7, -0.4, -0.3, 0.1, 0.5, 0.3, 0.5, -2.22044604925e-16, -0.7, -1.0, 0.9, 1.0, 1.0, 0.2, -0.4, 0.7, 0.7, -0.8, 1.0, -0.3, -0.4, -0.4, 0.6, 0.7, 0.7, 0.2, -0.2, 0.7, 0.2, -0.7, 0.9, -0.4, -0.6, 1.0, 0.2, -0.6, 1.0, 0.6, -0.1, -0.6, 0.7, 0.6, -1.0, -0.1, 0.5, 0.4, -0.3, -0.8, -0.3, 0.1, -0.7, 1.0, -0.8, -0.4, -1.0, 0.3, -0.1, 0.1, -0.7, -0.4, -0.4, -2.22044604925e-16, 0.4, -0.4, 0.3, -0.1, -0.8, 0.3, -0.1, 0.9, -0.3, -0.7, -2.22044604925e-16, -0.8, 0.6, -0.5, -1.0, 0.2, -0.2, -0.5, 0.5, -0.2, 0.8, -0.6, 0.4, -2.22044604925e-16, 0.5, -0.8, 0.9, -0.1, 0.8, 0.2, 0.8, -0.2, -0.5, -0.9, 1.0, -0.7, -0.7, 0.9, -0.5, 0.1, 0.6, -0.4, -2.22044604925e-16, 0.1, -0.5, 0.6, -0.8, -0.7, 0.3, -0.5, -1.0, -0.6, -0.5, -0.4, -0.4, 0.4, -0.3, 0.2, 0.4, -0.9, 1.0, -0.8, 0.6, -0.4, 0.2, -0.5, -1.0, -0.5, -1.0, -0.4, -0.5)))
-    # print(evaluate_driving(Autopilot((0.3, -0.6, 0.4, -0.5, 0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6, 0.3)), True))
-    #"""WINNERS: Chris Track"""
-    # print(evaluate_driving(Autopilot((-0.5, 0.8, -0.5, -0.4, -0.3, -0.6, -0.2, 0.4, -2.22044604925e-16, -0.9, -1.0, -0.6, 0.2, 0.5, -1.0, -2.22044604925e-16, 0.8, -0.8, -0.7, 0.5)), True))
-    # print(evaluate_driving(Autopilot((0.3, -1.0, -0.5, 0.8, -0.3, 0.3, 0.5, -0.6, 0.4, -0.4, 0.2, -0.2, 0.7, 0.5, -1.0, -2.22044604925e-16, -0.9, 1.0, -0.3, -0.9)), True))
-    # """FOR SPEED"""
-    # # print(evaluate_driving(Autopilot((0.6, 0.4, -0.1, -0.3, -0.5, 0.5, -0.5, 0.8, -0.7, -0.8, -0.2, -0.7, -0.3, 1.0, 0.3, -0.7, -0.9, -0.4, 1.0, -1.0)), True))
-    # # print(evaluate_driving(Autopilot((-0.7, 0.8, 0.3, -0.7, -0.6, -0.9, 0.2, 0.6, -0.9, -0.7, -0.4, -0.2, 0.1, 0.9, -0.7, -0.3, -0.9, -0.9, 0.1, 0.5)), True))
-    # """WINNERS: CLOVER TRACK"""
-    print(evaluate_driving(Autopilot((0.9, -1.0, -0.6, 0.9, 0.7, -0.2, 0.6, -0.6, 0.2, 0.5, 0.9, 0.5, -0.2, -2.22044604925e-16, -0.9, 1.0, -0.1, 0.1, 1.0, -0.3)), True))
-    # print(evaluate_driving(Autopilot((-0.5, -0.2, 0.3, -0.1, -0.5, -0.9, 1.0, 0.3, 0.1, -0.9, -0.1, -0.7, 0.9, 0.2, -0.7, 0.7, -0.4, 0.8, 0.5, 1.0)), True))
-    # print(evaluate_driving(Autopilot((0.1, -1.0, -0.6, 0.8, 0.1, 0.4, -0.6, -0.3, -0.6, -0.4, -0.7, 0.8, -0.4, -0.2, 0.5, 0.6, -0.5, 0.1, -0.1, 0.2)), True))
+        create_window(map_to_use)
+        map_to_use = pickle.load(open("map_name.p", "rb"))
 
-    # pop, log = evolve_autopilot()
+        print(evaluate_driving(Autopilot((0.9, -1.0, -0.6, 0.9, 0.7, -0.2, 0.6, -0.6, 0.2, 0.5, 0.9, 0.5, -0.2, -2.22044604925e-16, -0.9, 1.0, -0.1, 0.1, 1.0, -0.3)), True, map_name=map_to_use, memoize=False))
+        # print(evaluate_driving(Autopilot((-0.5, -0.2, 0.3, -0.1, -0.5, -0.9, 1.0, 0.3, 0.1, -0.9, -0.1, -0.7, 0.9, 0.2, -0.7, 0.7, -0.4, 0.8, 0.5, 1.0)), True))
+        # print(evaluate_driving(Autopilot((0.1, -1.0, -0.6, 0.8, 0.1, 0.4, -0.6, -0.3, -0.6, -0.4, -0.7, 0.8, -0.4, -0.2, 0.5, 0.6, -0.5, 0.1, -0.1, 0.2)), True))
+
+        # pop, log = evolve_autopilot()

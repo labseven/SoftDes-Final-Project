@@ -14,7 +14,7 @@ INCREMENT = pi/4
 def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], map_name="None"):
     # print(autopilot)
     size = (1000, 1000)
-    world = World(size)
+    world = World(size, map_name)
 
     view = View(size=size, map_in=world)
 
@@ -36,7 +36,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
             view.draw_start(size)
 """
-    reset_car(world)
+    reset_car(world, map_name)
     # print(world.car.position)
 
     while True:
@@ -91,7 +91,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             else:
                 return 0
         if world.detect_crash():  # If the car has crashed, reset it
-            reset_car(world)
+            reset_car(world, map_name)
 
             # print('FINAL SCORE:', score)
             if position_score == world.reward_matrix.max() and world.car.time_score < 50:
@@ -99,10 +99,15 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             return score
 
 
-def reset_car(world):
+def reset_car(world, map_name="NONE"):
     # print('Attempting to Reset Car')
     try:
-        temp_position, temp_angle = pickle.load(open("pos_ang.p", "rb"))
+        if map_name is not 'NONE':
+            file_add = map_name + '/'
+        else:
+            file_add = ''
+        temp_position, temp_angle = pickle.load(open(file_add + "pos_ang.p", "rb"))
+        print(temp_position)
 
         world.car_start_pos = temp_position
         world.car_start_angle = temp_angle
