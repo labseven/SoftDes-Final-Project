@@ -104,7 +104,7 @@ class View():
 
         self.process_draw_events(world, events, radius, color)  # Handle drawing stuff
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
-        self.draw_starting_line(world)
+        # self.draw_starting_line(world)
         if world.car.visible:
             self.draw_car(world.car)  # Draw on car
             # for checkpoint in world.checkpoints:
@@ -152,7 +152,8 @@ class View():
                     world.track_points.append(e.pos)  # adds position of mouse to checkpoint list
                     self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
-    def draw_starting_line(self, world, mask):
+    def draw_starting_line(self, world):
+        mask = self.get_road_surface(world.road)
         pos = world.car_start_pos
         angle = -world.car_start_angle
         surf = pygame.image.load("assets/StartingLine.png")
@@ -164,25 +165,25 @@ class View():
         # print(new_rect.center)
         # new_rect.topleft = (new_rect.topleft[0] + pos[0], new_rect.topleft[1] + pos[1])
 
-        mask.blit(rot_surf, (pos[0] -center_point[0], pos[1]-center_point[1]))
+        mask.blit(rot_surf, (pos[0] - center_point[0], pos[1]-center_point[1]))
 
 
-    def get_road_surface(self, world):
+    def get_road_surface(self, road):
         """
         Renders the pixels for a road on the frame.
         """
-        mask = pygame.Surface((world.road.shape[0], world.road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
+        mask = pygame.Surface((road.shape[0], road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
 
-        for x in range(0, world.road.shape[0]):
-            for y in range(0, world.road.shape[1]):
-                if world.road[x, y] == 255:
+        for x in range(0, road.shape[0]):
+            for y in range(0, road.shape[1]):
+                if road[x, y] == 255:
                     mask.set_at((x, y), ROAD_COLOR)
 
         # self.draw_starting_line(world, mask)
         # TODO Make this less wildly computationally inefficient
-        for x in range(0, world.road.shape[0]):
-            for y in range(0, world.road.shape[1]):
-                if world.road[x, y] != 255:
+        for x in range(0, road.shape[0]):
+            for y in range(0, road.shape[1]):
+                if road[x, y] != 255:
                     mask.set_at((x, y), BG_COLOR)
         return mask
 
