@@ -5,8 +5,6 @@ The Sensor class
 """
 
 from math import sin, cos, sqrt, pi
-import numpy as np
-
 
 class Sensors():
     """ Sensor class. Returns sensor values.

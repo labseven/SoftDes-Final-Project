@@ -117,9 +117,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 return 0
         if world.detect_crash():  # If the car has crashed, reset it
             reset_car(world, map_name)
-
+            # print(position_score, world.reward_matrix.max(), world.car.time_score)
             # catches cheating behavior exploiting the circular nature of any drawn track
-            if position_score == world.reward_matrix.max() and world.car.time_score < 50:
+            if position_score > 2 and world.car.time_score < 50:
                 score = 0
             return score
 
