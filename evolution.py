@@ -244,31 +244,7 @@ def create_window():
     Used to create UI popups that appear between runs of the Autopilots.
     Built using Tkinter tutorials mainly on stack overflow.
     """
-    #Create buttons and labels
-    def button1(event):
-        to_return = 'Circle_Track'
-        # Dumps the name of the map to pickle for cross-function access
-        pickle.dump(to_return, open('map_name.p', 'wb'))
-        root.destroy()
-
-    def button2(event):
-        to_return = 'Clover_track'
-        # Dumps the name of the map to pickle for cross-function access
-        pickle.dump(to_return, open('map_name.p', 'wb'))
-        root.destroy()
-
-    def button3(event):
-        to_return = 'Chris_Track'
-        # Dumps the name of the map to pickle for cross-function access
-        pickle.dump(to_return, open('map_name.p', 'wb'))
-        root.destroy()
-
-    def button4(event):
-        to_return = "Tri-Clover"
-        # Dumps the name of the map to pickle for cross-function access
-        pickle.dump(to_return, open('map_name.p', 'wb'))
-        root.destroy()
-
+    state = [None, -1]
     # Centers the window on the screen
     def center(toplevel):
         toplevel.update_idletasks()
@@ -281,40 +257,58 @@ def create_window():
 
     # Creates a window named root
     root = tk.Tk()
-    # Initializes a text box
-    T = Text(root, height=2, width=55)
-    # Centers the box and the text within
-    T.tag_configure("center", justify='center')
-    # adds text to the text box
-    T.insert(END, "The Simulation will run with pre-existing Autopilots.\nSelect which map they're run on!\n")
-    # implements the centering
-    T.tag_add("center", "1.0", "end")
 
-    # officially adds all components to the window
-    # Adds labels to buttons and resizes window slightly
-    T.pack()
-    b1 = tk.Button(root, text="Circle")
-    b1.pack()
-    b2 = tk.Button(root, text="Four-Leafed Clover")
-    b2.pack()
-    b3 = tk.Button(root, text="C-Shape")
-    b3.pack()
-    b4 = tk.Button(root, text="Tri-Clover")
-    b4.pack()
-    back = tk.Frame(master=root, width=255, height=45)
-    back.pack()
+    T = Text(root, height=2, width=35)  # Initializes a text box
+    T.tag_configure("center", justify='center')  # Centers the box and the text within
+    T.insert(END, "Select which map the simulation is run on!")  # adds text to the text box
+    T.tag_add("center", "1.0", "end")  # implements the centering
+
+    R = Text(root, height=2, width=16)
+    R.tag_configure("center", justify='center')  # Centers the box and the text within
+    R.insert(END, "Choose how the\n car drives!")  # adds text to the text box
+    R.tag_add("center", "1.0", "end")  # implements the centering
+
+    def sel():
+        d = {1: 'Circle_Track', 2: 'Clover_track', 3: 'Chris_Track', 4: 'Tri-Clover', 5: None}
+        print("You selected the option " + str(d[var1.get()]) + str(var2.get()))
+        state[0] = str(d[var1.get()])
+        state[1] = str(var2.get())
+        print(state[1] == '0')
+        if state[0] is not None and state[1] != '0':
+            pickle.dump(state, open('map_name.p', 'wb'))
+            root.destroy()
+
+    var1 = IntVar()
+
+    b1 = tk.Radiobutton(root, text="Circle", variable=var1, value=1, command=sel)
+    b2 = tk.Radiobutton(root, text="Four-Leafed Clover", variable=var1, value=2, command=sel)
+    b3 = tk.Radiobutton(root, text="C-Shape", variable=var1, value=3, command=sel)
+    b4 = tk.Radiobutton(root, text="Tri-Clover", variable=var1, value=4, command=sel)
+    b5 = tk.Radiobutton(root, text="Make Your Own", variable=var1, value=5, command=sel)
+
+    T.grid(row=0, column=0, sticky=tk.W+tk.E)
+    b1.grid(row=1, column=0, sticky=tk.W+tk.E)
+    b2.grid(row=2, column=0, sticky=tk.W+tk.E)
+    b3.grid(row=3, column=0, sticky=tk.W+tk.E)
+    b4.grid(row=4, column=0, sticky=tk.W+tk.E)
+    b5.grid(row=5, column=0, sticky=tk.W+tk.E)
+
+    var2 = IntVar()
+    R1 = Radiobutton(root, text="Existing Autonomous", variable=var2, value=1, command=sel)
+    R2 = Radiobutton(root, text="Evolve New Automous", variable=var2, value=2, command=sel)
+    R3 = Radiobutton(root, text="Drive it Yourself", variable=var2, value=3, command=sel)
+    R.grid(row=0, column=1, sticky=tk.W+tk.E)
+    R1.grid(row=1, column=1, sticky=tk.W+tk.E)
+    R2.grid(row=2, column=1, sticky=tk.W+tk.E)
+    R3.grid(row=3, column=1, sticky=tk.W+tk.E)
 
     # names and centers window
+    root.resizable(width=False, height=False)
+
     root.title("Choose Your Map")
     center(root)
 
-    # binds buttons to their command functions
-    b1.bind("<Button-1>", button1)
-    b2.bind("<Button-1>", button2)
-    b3.bind("<Button-1>", button3)
-    b4.bind("<Button-1>", button4)
     root.mainloop()
-
 
 # -----------------------------------------------------------------------------
 # Run if called from the command line
@@ -325,8 +319,8 @@ if __name__ == "__main__":
         # Opens popup window with choice of map_to_use
         create_window()
         # Access map name data generated by the interactive popup UI window
-        map_to_use = pickle.load(open("map_name.p", "rb"))
-
+        map_to_use, autopilot_style = pickle.load(open("map_name.p", "rb"))
+        print(autopilot_style)
         # """ WINNERS: CIRCLE TRACK"""
         # print(evaluate_driving(Autopilot((0.3, -0.6, 0.4, -0.5, 0.6, -0.7, -0.8, -0.2, -0.3, 0.1, -1.0, 0.6, 0.6, -0.2, -0.9, 0.3, -0.6, 0.5, -0.4, -0.6, 0.3)), True, map_name=map_to_use, memoize=False))
 
