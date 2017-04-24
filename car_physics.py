@@ -43,6 +43,7 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     max_slip_angle = math.radians(20)
 
     # Physical Coefficients
+    # Reference: http://www.asawicki.info/Mirror/Car%20Physics%20for%20Games/Car%20Physics%20for%20Games.html
     C_cornering = 4000
     C_drag = 0.45
     C_rolling = 30 * C_drag
@@ -64,21 +65,20 @@ def update_physics(position, velocity, angle, steering, F_traction, mass,
     # Angle of seperation between the vertical unit vector [0, -1] and the
     # velocity vector [v_x, v_y]
     beta = math.acos(-velocity[1] / (velocity[0]**2 + velocity[1]**2)**.5)
-    # Case that catches the acos innaccuracies in the third and fourth quads.
+
+    # Case that catches the acos innaccuracies in the third and fourth quadrants.
     if velocity[0] > 0:
         beta = 2*math.pi - beta
 
     if speed < 5:
-        base_speed = 5  # m/s
+        base_speed = 5  # m/s, average speed of car idling with no gas applied
         velocity[0] = -base_speed * car_vector[0]
         velocity[1] = -base_speed * car_vector[1]
         steering = -steering
-        # beta = 0
-        # print(velocity[0], velocity[1])
 
-    # speedometer print statement
+    # NOTE: speedometer print statement
     speed_mph = (int)(2.23694 * speed * 100) / 100
-    print(speed_mph, 'mph', end="\r")
+    # print(speed_mph, 'mph', end="\r")
 
     # Defines the difference between car's orientation and direction of travel
     angle_sep = theta - beta
