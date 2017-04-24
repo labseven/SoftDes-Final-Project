@@ -29,8 +29,10 @@ class View():
     """
     def __init__(self, size=(1000, 1000), map_in=None):
         """
+
         Initializes window based on size and which map to display. See documentation
         for valid map names.
+
         """
         self.track_points = []  # List of mouse points on track
         self.bg_color = (70, 204, 63)  # background color
@@ -38,16 +40,29 @@ class View():
         self.world = map_in
 
         self.screen = pygame.display.set_mode(size)
-<<<<<<< HEAD
+
         self.objs = self.build_obj_canvas()  # list containing all the sprite-objects to be drawn
         self.road_mask = self.get_road_surface(self.world.road)  # Matrix holding color values
 
         self.Button1 = Buttons.Button()
 
+
         self.ready_to_draw = False  # Boolean determining if the draw button has been clicked
         self.draw_on = False  # Boolean controlling user drawing on the canvas
 
     def build_obj_canvas(self, barn_pos=(50, 100), num_corn=100):
+
+        self.ready_to_draw = True
+
+        self.order_array_size = 100
+        self.order_array = []
+        for h in range(self.order_array_size):
+            row = []
+            for w in range(self.order_array_size):
+                row.append(-10)
+            self.order_array.append(row)
+
+    def build_obj_canvas(self, barn_pos=(100, 100), num_corn=100, cow_pos=(150, 150), cow_pos2=(190,100), cow_pos3=(40,80), cow_pos4=(160,50), cow_pos5=(230,150)):
         """
         Creates canvas of all static objects (corn and barn) for faster frame
         updates.
@@ -56,9 +71,19 @@ class View():
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
         barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
+        cow_surf = pygame.image.load("assets/cow.png") # Load cow gif
+        cow_surf = pygame.transform.scale(cow_surf, (50, 50))
 
         all_objs = [Sprite(barn_surf, barn_pos[0], barn_pos[1])]  # Barn object
-        # Generates corn positions randomly and populates objects, avoiding the road
+
+        all_objs.extend([Sprite(cow_surf, cow_pos[0], cow_pos[1])]) #cow object
+        all_objs.extend([Sprite(cow_surf, cow_pos2[0], cow_pos2[1])]) #cow object 2
+        all_objs.extend([Sprite(cow_surf, cow_pos3[0], cow_pos3[1])]) #cow object 3
+        all_objs.extend([Sprite(cow_surf, cow_pos4[0], cow_pos4[1])]) #cow object 4
+        all_objs.extend([Sprite(cow_surf, cow_pos5[0], cow_pos5[1])]) #cow object 5
+        # all_objs.extend([obj for obj in [Sprite(cow_surf, randint(-50, 999), randint(0, 999))
+                        # for x in range(num_cow)]])
+
         all_objs.extend([obj for obj in [Sprite(corn_surf, randint(-50, 999), randint(0, 999))
                         for x in range(num_corn)] if self.world.road[obj.x, obj.y] == 0
                         and not (-50 <= obj.x-all_objs[0].x <= 50 and
@@ -204,13 +229,15 @@ class View():
 
     def draw_buttons(self):
         """
-        Creates new button on top right corner of screen
-        Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+            Creates new button on top right corner of screen
         """
+        #Parameters:                  surface,    color,     x,  y, length, height, width,    text,          text_color
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
-        # Defines what happens when button is pressed
+        """
+            Defines what happens when button is pressed
+        """
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -219,6 +246,7 @@ class View():
                     self.world.road = np.zeros(self.size)  # when pressed, contents of road matrix is cleared, aka set to 0
                     self.road_mask = self.get_road_surface(self.world.road)  # re-renders the road picture on the screen so it is clear of road
 
+# http://stackoverflow.com/questions/597369/how-to-create-ms-paint-clone-with-python-and-pygame
 
     def roundline(self, world, color, start, end, radius):
         """
@@ -254,14 +282,24 @@ class View():
 
         world.road[world.road > 0] = 255  # This fixes issues with LIDAR drawings
 
+
+# https://github.com/GGRice/InteractiveProgramming/blob/master/pong.py
+
     def text_objects(self, text, font, color):
-        """Helper function for draw_start"""
+
+        """
+           Helper function for draw_start
+           Creates font of certain type, size, and color
+        """
+
         textSurface = font.render(text, True, color)
         return textSurface, textSurface.get_rect()
 
     def draw_start(self, size):
         """Creates the classic start screen"""
-        # Opens duplicate window and fills the background in white
+
+        #creates new screen, initializes it's colors and creates fonts
+
         screen1 = pygame.display.set_mode(size)
         screen1.fill(WHITE)
 
@@ -274,38 +312,59 @@ class View():
         # Loads assets
         corn_surf = pygame.image.load("assets/corn.png")
 
-        # Creates text objects
-        TextSurf, TextRect = self.text_objects('Corn', mylargefont, YELLOW)
-        TextSurfH, TextRectH = self.text_objects('HELL', mylargefont, RED)
+        #creates text objects to be printed
+        TextSurf, TextRect = self.text_objects('Maize Racer', mylargefont, YELLOW)
         TextSurf1, TextRect1 = self.text_objects('Can you survive the', myfont, YELLOW)
         TextSurf2, TextRect2 = self.text_objects('craziest track of all time...', myfont, YELLOW)
         TextSurf3, TextRect3 = self.text_objects('Only you decide!', mymedfont, YELLOW)
-        TextSurf4, TextRect4 = self.text_objects('Create your hell now!', mylargefont, YELLOW)
+        TextSurf4, TextRect4 = self.text_objects('Create your track now!', mylargefont, YELLOW)
         TextSurf5, TextRect5 = self.text_objects('Press Space Bar to Start', myfont, YELLOW)
 
-        # Places Text on the screen
-        TextRect.center = ((size[0]/2 - 75), (size[1]/4))
-        TextRectH.center = ((size[0]/2 + 75), (size[1]/4))
-        TextRect1.center = ((size[0]/2), (size[1]/2 - 200))
-        TextRect2.center = ((size[0]/2), (size[1]/2 - 150))
-        TextRect3.center = ((size[0]/2), (size[1]/2 - 100))
-        TextRect4.center = ((size[0]/2), (size[1]/2))
-        TextRect5.center = ((size[0]/2), (size[1]/4 * 3))
 
+        TextSurf6, TextRect6 = self.text_objects('Use the arrow keys to control car!', myfont, YELLOW)
+        TextSurf7, TextRect7 = self.text_objects('Go faster using the up arrow,', myfont, YELLOW)
+        TextSurf8, TextRect8 = self.text_objects('and slow down using the down arrow.', myfont, YELLOW)
+        TextSurf9, TextRect9 = self.text_objects('Steer with the left and right arrows', myfont, YELLOW)
+        TextSurf10, TextRect10 = self.text_objects('Draw track by clicking button then drawing with mouse', myfont, YELLOW)
+        TextSurf11, TextRect11 = self.text_objects('Draw a track then test your skills!', myfont, YELLOW)
+
+        #determines location for each text in terms of center of screen
+        TextRect.center = ((size[0]/2), (size[1]/4 - 100))
+        TextRect1.center = ((size[0]/2), (size[1]/2 - 250))
+        TextRect2.center = ((size[0]/2), (size[1]/2 - 200))
+        TextRect3.center = ((size[0]/2), (size[1]/2 - 150))
+        TextRect4.center = ((size[0]/2), (size[1]/2 - 50))
+        TextRect5.center = ((size[0]/2), (size[1]/4 * 3.5))
+        TextRect6.center = ((size[0]/2), (size[1]/2)+40)
+        TextRect7.center = ((size[0]/2), (size[1]/2)+80)
+        TextRect8.center = ((size[0]/2), (size[1]/2)+120)
+        TextRect9.center = ((size[0]/2), (size[1]/2)+160)
+        TextRect10.center = ((size[0]/2), (size[1]/2)+200)
+        TextRect11.center = ((size[0]/2), (size[1]/2)+300)
+
+        #actually displays the text on the screen
         screen1.blit(TextSurf, TextRect)
-        screen1.blit(TextSurfH, TextRectH)
         screen1.blit(TextSurf1, TextRect1)
         screen1.blit(TextSurf2, TextRect2)
         screen1.blit(TextSurf3, TextRect3)
         screen1.blit(TextSurf4, TextRect4)
         screen1.blit(TextSurf5, TextRect5)
 
-        # Places images on screen
+        screen1.blit(TextSurf6, TextRect6)
+        screen1.blit(TextSurf7, TextRect7)
+        screen1.blit(TextSurf8, TextRect8)
+        screen1.blit(TextSurf9, TextRect9)
+        screen1.blit(TextSurf10, TextRect10)
+        screen1.blit(TextSurf11, TextRect11)
+
+        #displays the corn in the 4 corners of the screen
+
         screen1.blit(corn_surf, (50, 50))
         screen1.blit(corn_surf, (50, size[1]-100))
         screen1.blit(corn_surf, (size[0]-100, 50))
         screen1.blit(corn_surf, (size[0]-100, size[1]-100))
 
+        #updates the display screen
         pygame.display.update()
 
 
