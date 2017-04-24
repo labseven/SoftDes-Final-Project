@@ -41,7 +41,6 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     reset_car(world, map_name)
     view.road_mask = view.get_road_surface(view.world)
 
-
     if draw:
         while start:
             events = get_events()
