@@ -74,9 +74,6 @@ class View():
         # self.draw_starting_line(world)
         if world.car.visible:
             self.draw_car(world.car)  # Draw on car
-            for checkpoint in world.checkpoints:
-                checkpoint_surf = pygame.image.load("assets/checkpoint.png")
-                self.screen.blit(checkpoint_surf, (checkpoint[0], checkpoint[1]-32))
         self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
