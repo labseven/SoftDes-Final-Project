@@ -332,6 +332,7 @@ if __name__ == "__main__":
         # print(evaluate_driving(Autopilot((0.6, -0.7, -0.5, 1.0, -0.7, 1.0, 0.5, -0.7, 0.2, 0.2, 0.9, 0.3, 0.2, -1.0, -0.1, 0.3, 0.0, 0.5, 0.1, 0.6)), True, map_name=map_to_use, memoize=False))
         # print(evaluate_driving(Autopilot((0.7, -0.3, -1.0, 0.8, -0.4, 0.6, 0.7, -1.0, 0.7, 0.8, 0.6, 0.3, 0.0, -0.3, -0.7, 0.9, 0.3, 0.7, 0.7, -0.9)), True, map_name=map_to_use, memoize=False))
 
+
         print(evaluate_driving(Autopilot((-0.3, -0.3, -1.0, 0.8, -0.4, 0.6, 0.7, -1.0, 0.7, 0.8, 0.6, 0.3, 0.0, -0.3, -0.7, 0.9, 0.3, 0.7, 0.7, -0.9)), True, map_name=map_to_use, memoize=False))
         # TRASH print(evaluate_driving(Autopilot((0.4, 0.4, -1.0, -0.1, -0.2, -0.4, 0.5, -1.0, -0.8, -0.2, -0.6, -0.6, 0.2, 0.2, 0.3, -0.4, 0.8, -0.5, 0.6, 0.1)), True, map_name=map_to_use, memoize=False))
         # used for rapid iterative evolution of autopilots.

@@ -42,7 +42,7 @@ class View():
         self.screen = pygame.display.set_mode(size)
 
         self.objs = self.build_obj_canvas()  # list containing all the sprite-objects to be drawn
-        self.road_mask = self.get_road_surface(self.world.road)  # Matrix holding color values
+        self.road_mask = self.get_road_surface(self.world)  # Matrix holding color values
 
         self.Button1 = Buttons.Button()
 
@@ -149,8 +149,7 @@ class View():
                     world.track_points.append(e.pos)  # adds position of mouse to checkpoint list
                     self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
-    def draw_starting_line(self, world):
-        mask = self.get_road_surface(world.road)
+    def draw_starting_line(self, world, mask):
         pos = world.car_start_pos
         angle = -world.car_start_angle
         surf = pygame.image.load("assets/StartingLine.png")
@@ -165,10 +164,11 @@ class View():
         mask.blit(rot_surf, (pos[0] - center_point[0], pos[1]-center_point[1]))
 
 
-    def get_road_surface(self, road):
+    def get_road_surface(self, world):
         """
         Renders the pixels for a road on the frame.
         """
+        road = world.road # Load the road
         mask = pygame.Surface((road.shape[0], road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
 
         for x in range(0, road.shape[0]):
@@ -176,7 +176,7 @@ class View():
                 if road[x, y] == 255:
                     mask.set_at((x, y), ROAD_COLOR)
 
-        # self.draw_starting_line(world, mask)
+        self.draw_starting_line(world, mask)
         # TODO Make this less wildly computationally inefficient
         for x in range(0, road.shape[0]):
             for y in range(0, road.shape[1]):
@@ -242,7 +242,7 @@ class View():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size)  # when pressed, contents of road matrix is cleared, aka set to 0
-                    self.road_mask = self.get_road_surface(self.world.road)  # re-renders the road picture on the screen so it is clear of road
+                    self.road_mask = self.get_road_surface(self.world)  # re-renders the road picture on the screen so it is clear of road
 
 # http://stackoverflow.com/questions/597369/how-to-create-ms-paint-clone-with-python-and-pygame
 
