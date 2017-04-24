@@ -37,6 +37,10 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
     start = False  # controls appearance of loading screen
     score = 0
+    # Sets car to the correct starting position based on the map
+    reset_car(world, map_name)
+    view.road_mask = view.get_road_surface(view.world)
+
 
     if draw:
         while start:
@@ -52,8 +56,6 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
             view.draw_start(size)
 
-    # Sets car to the correct starting position based on the map
-    reset_car(world, map_name)
 
     while True:
 

@@ -73,7 +73,6 @@ def main():
         world.car.update_pos(world.road)
 
         view.press_button(events)
-        world.detect_collisions()
 
         # Car Sounds
         if world.car.visible:
