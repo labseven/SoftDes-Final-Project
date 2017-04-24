@@ -38,6 +38,7 @@ class View():
         self.world = map_in
 
         self.screen = pygame.display.set_mode(size)
+<<<<<<< HEAD
         self.objs = self.build_obj_canvas()  # list containing all the sprite-objects to be drawn
         self.road_mask = self.get_road_surface(self.world.road)  # Matrix holding color values
 
@@ -47,7 +48,11 @@ class View():
         self.draw_on = False  # Boolean controlling user drawing on the canvas
 
     def build_obj_canvas(self, barn_pos=(50, 100), num_corn=100):
-        """Build transparent surface containing all sprite-objects"""
+        """
+        Creates canvas of all static objects (corn and barn) for faster frame
+        updates.
+        """
+        # Build transparent surface
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
         barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
@@ -74,10 +79,12 @@ class View():
 
         self.process_draw_events(world, events, radius, color)  # Handle drawing stuff
         self.screen.blit(self.road_mask, (0, 0))  # Mask road and background together
+        self.draw_starting_line(world)
         if world.car.visible:
-            self.draw_car(world.car)  # Draw on car, and by extension lidar
-            for checkpoint in world.checkpoints:
-                pygame.draw.rect(self.screen, (255, 255, 255), (checkpoint[0], checkpoint[1], 10, 10), 0)
+            self.draw_car(world.car)  # Draw on car
+            # for checkpoint in world.checkpoints:
+            #     checkpoint_surf = pygame.image.load("assets/checkpoint.png")
+            #     self.screen.blit(checkpoint_surf, (checkpoint[0], checkpoint[1]-32))
         self.screen.blit(self.objs, (0, 0))
         self.draw_buttons()
         pygame.display.flip()
@@ -103,6 +110,7 @@ class View():
                     self.draw_on = False  # Make sure we already aren't drawing
                     self.ready_to_draw = True  # Make it possible to draw
                     world.car.visible = False  # Stop drawing the car temporarily
+                    self.road_mask = pygame.Surface((world.road.shape[0], world.road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
 
                 elif self.draw_on:  # If the mouse was lifted up after drawing
                     self.draw_on = False
@@ -111,23 +119,48 @@ class View():
                     world.reset_car()  # Reset the car, the track has been re-drawn
                     world.car.visible = True
                     world.update_checkpoints()
+                    self.road_mask = self.get_road_surface(self.world) #rerenders the road picture on the screen so it is clear fo road
+
 
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
                     world.track_points.append(e.pos)  # adds position of mouse to checkpoint list
                     self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
-    def get_road_surface(self, road):
+    def draw_starting_line(self, world, mask):
+        pos = world.car_start_pos
+        angle = -world.car_start_angle
+        surf = pygame.image.load("assets/StartingLine.png")
+
+        surf_rect = surf.get_rect()
+        rot_surf = pygame.transform.rotate(surf, 180-angle*(180/3.1416))
+        center_point = rot_surf.get_rect().center
+        # new_rect = rot_surf.get_rect()
+        # print(new_rect.center)
+        # new_rect.topleft = (new_rect.topleft[0] + pos[0], new_rect.topleft[1] + pos[1])
+
+        mask.blit(rot_surf, (pos[0] -center_point[0], pos[1]-center_point[1]))
+
+
+    def get_road_surface(self, world):
         """
         Renders the pixels for a road on the frame.
         """
-        mask = pygame.Surface((road.shape[0], road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
+        mask = pygame.Surface((world.road.shape[0], world.road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
 
-        for x in range(0, road.shape[0]):
-            for y in range(0, road.shape[1]):
-                if road[x, y] == 255:
+        for x in range(0, world.road.shape[0]):
+            for y in range(0, world.road.shape[1]):
+                if world.road[x, y] == 255:
                     mask.set_at((x, y), ROAD_COLOR)
+
+        # self.draw_starting_line(world, mask)
+        # TODO Make this less wildly computationally inefficient
+        for x in range(0, world.road.shape[0]):
+            for y in range(0, world.road.shape[1]):
+                if world.road[x, y] != 255:
+                    mask.set_at((x, y), BG_COLOR)
         return mask
+
 
     def draw_car(self, car):
         """
@@ -170,12 +203,14 @@ class View():
         return screen
 
     def draw_buttons(self):
-        # creates new button on top right corner of screen
-        # Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+        """
+        Creates new button on top right corner of screen
+        Parameters:               surface,    color,     x,  y, length, height, width,    text,          text_color
+        """
         self.Button1.create_button(self.screen, (107,142,35), 690, 10, 300,    50,    0,  "Draw New Track", (255,255,255))
 
     def press_button(self, events):
-        # defines what happens when button is pressed
+        # Defines what happens when button is pressed
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -183,6 +218,7 @@ class View():
                 if self.Button1.pressed(pygame.mouse.get_pos()):
                     self.world.road = np.zeros(self.size)  # when pressed, contents of road matrix is cleared, aka set to 0
                     self.road_mask = self.get_road_surface(self.world.road)  # re-renders the road picture on the screen so it is clear of road
+
 
     def roundline(self, world, color, start, end, radius):
         """

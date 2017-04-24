@@ -17,7 +17,7 @@ class World_Map():
         for i in range(size[0]):
             self.world_map[i][i] = 1
         print("Made world_map")
-
+from math import pi
 
 class World():
     def __init__(self, size=(1000, 1000), map_name='NONE'):
@@ -67,6 +67,7 @@ class World():
             except:
                 return True
 
+
     def reset_car(self):
         """
         Resets the position, angle, and velocity of the car.
@@ -77,6 +78,9 @@ class World():
         self.car.visible = True
 
     def update_checkpoints(self, num_checkpoints=100):
+        """
+        Builds a list of checkpoints based on a list of mouse movement points.
+        """
         track_points_len = len(self.track_points)
         checkpoint_indices = [int(track_points_len/(num_checkpoints+1)*val) for val in range(1, num_checkpoints+1)]
         self.checkpoints = [self.track_points[idx] for idx in checkpoint_indices]

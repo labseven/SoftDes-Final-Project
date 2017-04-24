@@ -57,7 +57,6 @@ class Car():
 
         # Drawing things
         self.color = car_color
-        self.sensors = Sensors(self, road, world_size)
         self.lidar_distances = []
         self.lidar_hits = []
         self.sprite_w = 16
@@ -76,6 +75,11 @@ class Car():
     def update_pos(self, road):
         """
         Calls the physics functions and updates the state of the car.
+        Moves car one time step.
+        Applies physics based on state variables, including velocity,
+        accelerometer input, and steering wheel input.
+
+        Updates car position and sensor readouts.
         """
         delta_time = .1
 
