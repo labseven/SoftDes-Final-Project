@@ -55,15 +55,10 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
             view.draw_start(size)
 
-
     while True:
 
         events = get_events()
 
-        if draw:
-            # draws the map, car and button
-            view.draw_scene(world, events)
-            view.press_button(events)
         if control:
             # generates a list of each key's pressed status (0=up, 1=pressed)
             # The list is for keys [W, S, A, D]
@@ -76,6 +71,12 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             # Returns the x and y components respectively of the final summed vector.
             d_steer, d_gas = world.car.sensors.calculate_changes(autopilot)
 
+            if draw:
+                # draws the map, car and button
+                view.coords = (d_steer, d_gas)
+                view.draw_scene(world, events)
+                view.press_button(events)
+                # Experimental Draving of Autopilot Vector
             # Limits the gas applied to be within the constraints of the system
             if d_gas > 1:
                 d_gas = 1
@@ -83,10 +84,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 d_gas = -1
 
             # Sets the new turn and acceleration values for the car
-            # TODO implement drawing of this vector
             world.car.driving_force = 2.5 * d_gas * FORCE
             world.car.steering = atan(d_steer / d_gas)
-
+            print(world.car.driving_force, world.car.steering, end='\r')
         # Limits the amount the wheels can be turned
         if world.car.steering > steering_max:
             world.car.steering = steering_max

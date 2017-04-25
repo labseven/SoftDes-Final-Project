@@ -45,7 +45,7 @@ class View():
         self.road_mask = self.get_road_surface(self.world)  # Matrix holding color values
 
         self.Button1 = Buttons.Button()
-
+        self.coords = (0, 0)
 
         self.ready_to_draw = False  # Boolean determining if the draw button has been clicked
         self.draw_on = False  # Boolean controlling user drawing on the canvas
@@ -206,6 +206,19 @@ class View():
         self.draw_lidar(car)
         self.screen.blit(rot_car, new_rect)
 
+    def update_draw_vector(self, car):
+        theta = -car.angle[0]
+        autopilot_vector = np.matrix([[self.coords[0]], [self.coords[1]]])
+        rotation_matrix = np.matrix([[math.cos(theta), -1 * math.sin(theta)],
+                                     [math.sin(theta), math.cos(theta)]])
+        position_matrix = np.matrix([[car.position[0]], [car.position[1]]])
+
+        autopilot_vector = rotation_matrix * autopilot_vector + position_matrix
+        autopilot_vector = ((int)(autopilot_vector.item(0)), (int)(autopilot_vector.item(1)))
+
+        pygame.draw.line(self.screen, (0, 0, 255), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), autopilot_vector)
+
+
     def draw_lidar(self, car):
         """
         Draws lidar beams
@@ -213,8 +226,10 @@ class View():
         # NOTE: Enable to draw the car's hitbox in white
         # pygame.draw.polygon(self.screen, WHITE, car.points)
 
+        self.update_draw_vector(car)
         for hit in car.lidar_hits:
             pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), hit)
+
 
     def draw_decorations(self, objects, screen):
         """
