@@ -27,10 +27,10 @@ import pickle
 # -----------------------------------------------------------------------------
 #  Global variables
 # -----------------------------------------------------------------------------
-MAP_NAME = 'Tri-Clover'
-
+MAP_NAME = 'Clover_track'
+EVOLVING = False
 # Establish a list of coefficients for the mutation method to insert into the genome
-VALID_COEFF = numpy.arange(-1, 1.1, 0.1)
+VALID_COEFF = numpy.arange(-1, 1.1, 0.001)
 # Control whether all Autopilots are printed as they are evaluated
 VERBOSE = False
 
@@ -136,6 +136,9 @@ def evaluate_driving(auto, draw=True, verbose=VERBOSE, map_name=MAP_NAME, memoiz
     """
     # memoiziation
     mem = False
+    if EVOLVING:
+        memoize = True
+        draw = False
     if memoize:
         # disabled for the show of runnning multiple autopilots on different maps
         try:
@@ -310,6 +313,7 @@ def create_window():
 
     root.mainloop()
 
+
 # -----------------------------------------------------------------------------
 # Run if called from the command line
 # -----------------------------------------------------------------------------
@@ -334,11 +338,23 @@ if __name__ == "__main__":
         # print(evaluate_driving(Autopilot((0.7, -0.3, -1.0, 0.8, -0.4, 0.6, 0.7, -1.0, 0.7, 0.8, 0.6, 0.3, 0.0, -0.3, -0.7, 0.9, 0.3, 0.7, 0.7, -0.9)), True, map_name=map_to_use, memoize=False))
 
         if autopilot_style == '2' or autopilot_style == '3':
+            EVOLVING = False
             control_style = autopilot_style == '3'
-            print(evaluate_driving(Autopilot((-0.3, -0.3, -1.0, 0.8, -0.4, 0.6, 0.7, -1.0, 0.7, 0.8, 0.6, 0.3, 0.0, -0.3, -0.7, 0.9, 0.3, 0.7, 0.7, -0.9)), True, map_name=map_to_use, memoize=False, control=control_style))
-        # TRASH print(evaluate_driving(Autopilot((0.4, 0.4, -1.0, -0.1, -0.2, -0.4, 0.5, -1.0, -0.8, -0.2, -0.6, -0.6, 0.2, 0.2, 0.3, -0.4, 0.8, -0.5, 0.6, 0.1)), True, map_name=map_to_use, memoize=False))
+            # print(evaluate_driving(Autopilot((-0.3, -0.3, -1.0, 0.8, -0.4, 0.6, 0.7, -1.0, 0.7, 0.8, 0.6, 0.3, 0.0, -0.3, -0.7, 0.9, 0.3, 0.7, 0.7, -0.9)), True, map_name=map_to_use, memoize=False, control=control_style))
+            # print(evaluate_driving(Autopilot((0.7, -0.3, -1.0, 0.8, -0.4, 0.6, 0.7, -1.0, 0.7, 0.8, 0.6, 0.3, 0.0, -0.3, -0.7, 0.9, 0.3, 0.7, 0.7, -0.9)), True, map_name=map_to_use, memoize=False, control=control_style))
+
+            # 13
+            print(evaluate_driving(Autopilot((-0.836, -0.925, -0.694, 0.467, 0.707, 0.616, 0.907, -0.245, 0.537, -0.431, 0.717, -0.085, 0.526, -0.315, 0.306, 0.384, -0.729, 1.052, 0.356, -0.352)), True, map_name=map_to_use, memoize=False, control=control_style))
+            # 11.9
+            print(evaluate_driving(Autopilot((-0.9, -0.925, -0.694, 0.467, 0.707, 0.616, 0.907, -0.245, 0.537, -0.431, 0.791, -0.085, 0.526, -0.315, 0.306, 0.384, -0.729, 1.052, 0.356, -0.352)), True, map_name=map_to_use, memoize=False, control=control_style))
+            # 11.5
+            print(evaluate_driving(Autopilot((-0.9, -0.587, -0.694, 0.467, 0.707, 0.616, 0.907, -0.245, 0.537, -0.431, 0.912, -0.085, 0.526, -0.315, 0.306, 0.384, -0.729, 1.052, 0.356, -0.352)), True, map_name=map_to_use, memoize=False, control=control_style))
         # used for rapid iterative evolution of autopilots.
         else:
+            print(MAP_NAME)
+            MAP_NAME = map_to_use
+            print(MAP_NAME)
+            EVOLVING = True
             pop, log, hof = evolve_autopilot()
         # file_object = open('BoTb.txt', 'a')
         # file_object.write(str(hof))

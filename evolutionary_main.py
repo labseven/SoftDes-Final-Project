@@ -86,7 +86,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             # Sets the new turn and acceleration values for the car
             world.car.driving_force = 2.5 * d_gas * FORCE
             world.car.steering = atan(d_steer / d_gas)
-            print(world.car.driving_force, world.car.steering, end='\r')
+            # print(world.car.driving_force, world.car.steering, end='\r')
         # Limits the amount the wheels can be turned
         if world.car.steering > steering_max:
             world.car.steering = steering_max

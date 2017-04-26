@@ -163,7 +163,6 @@ class View():
 
         mask.blit(rot_surf, (pos[0] - center_point[0], pos[1]-center_point[1]))
 
-
     def get_road_surface(self, world):
         """
         Renders the pixels for a road on the frame.
@@ -183,7 +182,6 @@ class View():
                 if road[x, y] != 255:
                     mask.set_at((x, y), BG_COLOR)
         return mask
-
 
     def draw_car(self, car):
         """
@@ -209,15 +207,26 @@ class View():
     def update_draw_vector(self, car):
         theta = -car.angle[0]
         autopilot_vector = np.matrix([[self.coords[0]], [self.coords[1]]])
+        lateral_vector = np.matrix([[self.coords[0]], [0]])
+        longitudinal_vector = np.matrix([[0], [self.coords[1]]])
+
         rotation_matrix = np.matrix([[math.cos(theta), -1 * math.sin(theta)],
                                      [math.sin(theta), math.cos(theta)]])
+
         position_matrix = np.matrix([[car.position[0]], [car.position[1]]])
 
         autopilot_vector = rotation_matrix * autopilot_vector + position_matrix
         autopilot_vector = ((int)(autopilot_vector.item(0)), (int)(autopilot_vector.item(1)))
 
-        pygame.draw.line(self.screen, (0, 0, 255), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), autopilot_vector)
+        lateral_vector = rotation_matrix * lateral_vector + position_matrix
+        lateral_vector = ((int)(lateral_vector.item(0)), (int)(lateral_vector.item(1)))
 
+        longitudinal_vector = rotation_matrix * longitudinal_vector + position_matrix
+        longitudinal_vector = ((int)(longitudinal_vector.item(0)), (int)(longitudinal_vector.item(1)))
+
+        pygame.draw.line(self.screen, (0, 0, 255), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), autopilot_vector)
+        pygame.draw.line(self.screen, (255, 255, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), lateral_vector)
+        pygame.draw.line(self.screen, (255, 0, 255), autopilot_vector, lateral_vector)
 
     def draw_lidar(self, car):
         """
@@ -229,7 +238,6 @@ class View():
         self.update_draw_vector(car)
         for hit in car.lidar_hits:
             pygame.draw.line(self.screen, (250, 0, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), hit)
-
 
     def draw_decorations(self, objects, screen):
         """
