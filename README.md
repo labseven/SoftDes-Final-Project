@@ -6,7 +6,7 @@ Adam Novotny
 Matthew Brucker  
 Gretchen Rice  
 
-This is our final project for Software Design, Spring 2017, at Olin college. 
+Welcome! This is our final project for Software Design, Spring 2017, at Olin college. 
 
 ### Attributions
 http://stackoverflow.com/questions/1436703
@@ -34,10 +34,10 @@ tkinter: $ sudo apt-get install python3-tk
   
 sudo pip install -r requirements.txt
 ```
-
+After installing these packages, go to the top of our github page (this page) and clone the repository or download the zip file (the green "clone or download" button). You then have the project on your computer will all the supporting class files.
 
 ## Usage
-To run code from terminal in Ubuntu, run command "python3 evolution.py"  
+To run code from terminal in Ubuntu, navigate to the proper folder and run the command "python3 evolution.py"  
 When window opens you will select how to run the simulator.You will have options of which map appears and how the car drives. You can either choose an existing track or chose to create your own map and you can choose whether to have the car drive autonomously or to drive the car yourself.  
 
 Whenever you choose to "Make Your Own" track you will use the system like any other paint application. While left clicking, you will move the mouse in order to draw a track.
@@ -49,5 +49,7 @@ If you choose for the car to be driven autonomously on an existing track there i
 If you choose to drive the car yourself you will be in complete control of the car. Using the arrow keys (with the back arrow as break, not reverse), you will try to drive the car around the track. Again, you can choose a predrawn track or you can choose to draw your own.
 
 ## License
+Corn Racer is licensed under GNU GPLv3. For more information, reference the "LICENSE" file in the Corn Racer repository.
 
 ## Implementation Details
+
