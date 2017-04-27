@@ -6,7 +6,14 @@ Adam Novotny
 Matthew Brucker  
 Gretchen Rice  
   
--> Attributions go here
+http://stackoverflow.com/questions/1436703
+https://github.com//sd17spring/ToolBox-EvolutionaryAlgorithms
+http://deap.gel.ulaval.ca/doc/dev/api/algo.html  
+http://stackoverflow.com/questions/597369/how-to-create-ms-paint-clone-with-python-and-pygame
+https://github.com/GGRice/InteractiveProgramming/blob/master/pong.py
+https://www.pygame.org/project/2541
+lodev.org/cgtutor/raycasting.html
+
 
 ## What does it do?
 Corn RacEAR is, at its lowest level, a car simulator game. There are two choices of gameplay. You can choose to either draw a track and drive around the track manually or have the car drive around autonomously. For autonomous drive, you can choose to watch the car drive around a pre-driven track or can draw a track and watch the car learn how to drive around it.
