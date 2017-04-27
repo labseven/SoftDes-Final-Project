@@ -34,6 +34,12 @@ class World():
         self.car_start_pos = (500, 500)
         self.car_start_angle = 0
 
+        map_selected, autopilot_style = pickle.load(open("map_name.p", "rb"))
+        if autopilot_style == "3":
+            self.draw_new = False
+        else:
+            self.draw_new = True
+
         self.reward_matrix = np.zeros(size)
 
         try:
@@ -59,6 +65,7 @@ class World():
         """
         Returns True if the car has crashed, False otherwise
         """
+
         if np.all(self.reward_matrix == 0):
             return False
         else:
@@ -68,12 +75,10 @@ class World():
             except:
                 return True
 
-
     def reset_car(self):
         """
         Resets the position, angle, and velocity of the car.
         """
-        self.draw_new = False
         self.car.position = self.car_start_pos  # Set the car at the starting point
         self.car.angle = [self.car_start_angle, 0]  # Set the car at the starting heading
         self.car.velocity = [0, 0]  # Stop the car
@@ -91,7 +96,7 @@ class World():
 
         pickle.dump(self.road, open('road.p', 'wb'))
         pickle.dump(combined_save, open('pos_ang.p', 'wb'))
-        if self.draw_new is False:
+        if self.draw_new is True:
                 self.update_reward_matrix()
                 pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
 

@@ -127,6 +127,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             world.car.steering = steering_max
         elif world.car.steering < -steering_max:
             world.car.steering = -steering_max
+        if world.detect_crash():  # If the car has crashed, reset it
+            reset_car(world, map_name)
+            # print('crashed')
         # Updates the physics of the car
         world.car.update_pos(world.road)
 
@@ -139,14 +142,15 @@ def reset_car(world, map_name="NONE"):
         if map_name is not 'NONE':
             file_add = map_name + '/'
         else:
-            file_add = ''
-        temp_position, temp_angle = pickle.load(open(file_add + "pos_ang.p", "rb"))
+            file_add = None
+        temp_position, temp_angle = pickle.load(open(str(file_add) + "pos_ang.p", "rb"))
 
         world.car_start_pos = temp_position
         world.car_start_angle = temp_angle
         # Moves the car to the correct position as well as the right angle.
         world.reset_car()
-    except:
+    except(FileNotFoundError):
+        print('couldnt find files')
         pass
 
 

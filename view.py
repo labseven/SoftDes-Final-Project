@@ -118,21 +118,21 @@ class View():
             if e.type == pygame.MOUSEBUTTONUP:
                 x, y = e.pos
                 # bounds of the upper right button, hacky solution but time was short
-                if x > 690 and x < 990 and y > 10 and y < 60:  # If button is pressed and released
-                    self.draw_on = False  # Make sure we already aren't drawing
-                    self.ready_to_draw = True  # Make it possible to draw
-                    world.car.visible = False  # Stop drawing the car temporarily
-                    self.road_mask = pygame.Surface((world.road.shape[0], world.road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
+                if self.map_selected == "None":
+                    if x > 690 and x < 990 and y > 10 and y < 60:  # If button is pressed and released
+                        self.draw_on = False  # Make sure we already aren't drawing
+                        self.ready_to_draw = True  # Make it possible to draw
+                        world.car.visible = False  # Stop drawing the car temporarily
+                        self.road_mask = pygame.Surface((world.road.shape[0], world.road.shape[1]), pygame.SRCALPHA, 32).convert_alpha()
 
-                elif self.draw_on:  # If the mouse was lifted up after drawing
-                    self.draw_on = False
-                    self.objs = self.build_obj_canvas()  # rebuild sprites to avoid road
-                    world.car_start_angle = get_start_angle(world.track_points)
-                    world.reset_car()  # Reset the car, the track has been re-drawn
-                    world.car.visible = True
-                    world.update_checkpoints()
-                    self.road_mask = self.get_road_surface(self.world) #rerenders the road picture on the screen so it is clear fo road
-
+                    elif self.draw_on:  # If the mouse was lifted up after drawing
+                        self.draw_on = False
+                        self.objs = self.build_obj_canvas()  # rebuild sprites to avoid road
+                        world.car_start_angle = get_start_angle(world.track_points)
+                        world.reset_car()  # Reset the car, the track has been re-drawn
+                        world.car.visible = True
+                        world.update_checkpoints()
+                        self.road_mask = self.get_road_surface(self.world) #rerenders the road picture on the screen so it is clear fo road
 
             if e.type == pygame.MOUSEMOTION:
                 if self.draw_on:
