@@ -34,7 +34,7 @@ tkinter: $ sudo apt-get install python3-tk
   
 sudo pip install -r requirements.txt
 ```
-After installing these packages, go to the top of our github page (this page) and clone the repository or download the zip file (the green "clone or download" button). You then have the project on your computer will all the supporting class files.
+After installing these packages, go to the top of our github page (this page) and clone the repository or download the zip file (the green "clone or download" button). You then have the project on your computer with all the supporting class files.
 
 ## Usage
 To run code from terminal in Ubuntu, navigate to the proper folder and run the command "python3 evolution.py"  
