@@ -9,6 +9,7 @@ import numpy as np
 from random import randint
 from collections import namedtuple
 import math
+import pickle
 #############################################
 # GLOBAL VARIABLES
 #############################################
@@ -29,11 +30,11 @@ class View():
     """
     def __init__(self, size=(1000, 1000), map_in=None):
         """
-
         Initializes window based on size and which map to display. See documentation
         for valid map names.
-
         """
+        self.map_selected, self.autopilot_style = pickle.load(open("map_name.p", "rb"))
+
         self.track_points = []  # List of mouse points on track
         self.bg_color = (70, 204, 63)  # background color
         self.size = size
@@ -50,18 +51,6 @@ class View():
         self.ready_to_draw = False  # Boolean determining if the draw button has been clicked
         self.draw_on = False  # Boolean controlling user drawing on the canvas
 
-    def build_obj_canvas(self, barn_pos=(50, 100), num_corn=100):
-
-        self.ready_to_draw = True
-
-        self.order_array_size = 100
-        self.order_array = []
-        for h in range(self.order_array_size):
-            row = []
-            for w in range(self.order_array_size):
-                row.append(-10)
-            self.order_array.append(row)
-
     def build_obj_canvas(self, barn_pos=(100, 100), num_corn=100, cow_pos=(150, 150), cow_pos2=(190,100), cow_pos3=(40,80), cow_pos4=(160,50), cow_pos5=(230,150)):
         """
         Creates canvas of all static objects (corn and barn) for faster frame
@@ -71,7 +60,7 @@ class View():
         obj_surfaces = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA, 32).convert_alpha()
         corn_surf = pygame.image.load("assets/corn.png")  # Load corn image
         barn_surf = pygame.image.load("assets/barn.png")  # Load barn image
-        cow_surf = pygame.image.load("assets/cow.png") # Load cow gif
+        cow_surf = pygame.image.load("assets/cow.png")  # Load cow gif
         cow_surf = pygame.transform.scale(cow_surf, (50, 50))
 
         all_objs = [Sprite(barn_surf, barn_pos[0], barn_pos[1])]  # Barn object
@@ -108,7 +97,8 @@ class View():
         if world.car.visible:
             self.draw_car(world.car)  # Draw on car
         self.screen.blit(self.objs, (0, 0))
-        self.draw_buttons()
+        if self.map_selected == "None":
+            self.draw_buttons()
         pygame.display.flip()
 
     def process_draw_events(self, world, events, radius, color):

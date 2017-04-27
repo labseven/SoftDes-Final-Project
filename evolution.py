@@ -60,7 +60,7 @@ class Autopilot(list):
         """
         Create a new Autopilot individual.
 
-        If starting_string is given, initialize the Autopilot with the
+        If initial_vals is given, initialize the Autopilot with the
         provided string message. Otherwise if -2, initialize to a random string
         message with length between min_length and max_length.
         """
@@ -354,8 +354,8 @@ if __name__ == "__main__":
             print(MAP_NAME)
             MAP_NAME = map_to_use
             print(MAP_NAME)
-            EVOLVING = True
+            EVOLVING = False
             pop, log, hof = evolve_autopilot()
-        # file_object = open('BoTb.txt', 'a')
-        # file_object.write(str(hof))
-        # file_object.close()
+            file_object = open('BoTb.txt', 'a')
+            file_object.write(str(hof))
+            file_object.close()

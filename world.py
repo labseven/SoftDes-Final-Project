@@ -7,6 +7,7 @@ from car import Car
 from random import randint
 import pickle
 import numpy as np
+from math import pi
 
 
 class World_Map():
@@ -17,7 +18,7 @@ class World_Map():
         for i in range(size[0]):
             self.world_map[i][i] = 1
         print("Made world_map")
-from math import pi
+
 
 class World():
     def __init__(self, size=(1000, 1000), map_name='NONE'):
@@ -72,6 +73,7 @@ class World():
         """
         Resets the position, angle, and velocity of the car.
         """
+        self.draw_new = False
         self.car.position = self.car_start_pos  # Set the car at the starting point
         self.car.angle = [self.car_start_angle, 0]  # Set the car at the starting heading
         self.car.velocity = [0, 0]  # Stop the car
@@ -84,13 +86,14 @@ class World():
         track_points_len = len(self.track_points)
         checkpoint_indices = [int(track_points_len/(num_checkpoints+1)*val) for val in range(1, num_checkpoints+1)]
         self.checkpoints = [self.track_points[idx] for idx in checkpoint_indices]
-        self.update_reward_matrix()
 
         combined_save = [self.car_start_pos, self.car_start_angle]
 
         pickle.dump(self.road, open('road.p', 'wb'))
-        pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
         pickle.dump(combined_save, open('pos_ang.p', 'wb'))
+        if self.draw_new is False:
+                self.update_reward_matrix()
+                pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
 
     def update_reward_matrix(self):
         checks = len(self.checkpoints)
