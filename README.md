@@ -22,7 +22,7 @@ lodev.org/cgtutor/raycasting.html
 Corn Racer is, at its lowest level, a car simulator game. There are two choices of gameplay. You can choose to either draw a track and drive around the track manually or have the car drive around autonomously. For autonomous drive, you can choose to watch the car drive around a pre-driven track or can draw a track and watch the car learn how to drive around it.
 
 ## Getting Started
-In order to run this program you must have Python3 installed on your computer. Along with Python3 you need a a few dependancies... 
+In order to run this program you must have Python3 installed on your computer. Along with Python3 you need a a few dependencies... 
 
 ```
 pygame: $ sudo apt-get build-dep python-pygame  
