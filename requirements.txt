@@ -1,0 +1,3 @@
+﻿# pip installments for numpy, deap, and tkinter
+numpy
+deap 
