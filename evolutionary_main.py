@@ -30,6 +30,8 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
         map_name    string representation of the map to be used. See documentation for valid names.
     """
     # Initializes world and window
+    lives = 4
+
     size = (1000, 1000)
     world = World(size, map_name)
     view = View(size=size, map_in=world)
@@ -72,6 +74,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
             if world.detect_crash():  # If the car has crashed, reset it
                 reset_car(world, map_name)
+                lives -= 1
+                if lives <= 0:
+                    return "Run Out Of Lives!"
         else:
             # Of the form (turn, accelerator)
             # Returns the x and y components respectively of the final summed vector.
@@ -106,6 +111,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                     # add the speed to incentivize quicker laptimes
                     score += world.car.average_speed
                 return score
+
             else:  # car didnt go down in value
                 score = hold
 
@@ -121,7 +127,8 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 # catches cheating behavior exploiting the circular nature of any drawn track
                 if position_score > 2 and world.car.time_score < 50:
                     score = 0
-                return score
+                if world.car.time_score > .2:
+                    return score
 
         if world.car.steering > steering_max:
             world.car.steering = steering_max
@@ -129,7 +136,6 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             world.car.steering = -steering_max
         if world.detect_crash():  # If the car has crashed, reset it
             reset_car(world, map_name)
-            # print('crashed')
         # Updates the physics of the car
         world.car.update_pos(world.road)
 
@@ -139,10 +145,10 @@ def reset_car(world, map_name="NONE"):
     Reads the world file and gets the starting position and angle for this specific map
     """
     try:
-        if map_name is not 'NONE':
+        if map_name != 'None':
             file_add = map_name + '/'
         else:
-            file_add = None
+            file_add = ''
         temp_position, temp_angle = pickle.load(open(str(file_add) + "pos_ang.p", "rb"))
 
         world.car_start_pos = temp_position
@@ -150,6 +156,7 @@ def reset_car(world, map_name="NONE"):
         # Moves the car to the correct position as well as the right angle.
         world.reset_car()
     except(FileNotFoundError):
+        print(file_add + "pos_ang.p")
         print('couldnt find files')
         pass
 

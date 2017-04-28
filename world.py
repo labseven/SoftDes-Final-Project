@@ -7,7 +7,6 @@ from car import Car
 from random import randint
 import pickle
 import numpy as np
-from math import pi
 
 
 class World_Map():
@@ -25,6 +24,7 @@ class World():
         """
         Initializes the numpy matrix for the road and creates a car.
         """
+        self.started = False
 
         # self.road = World_Map(size)
         self.size = size
@@ -39,19 +39,21 @@ class World():
             self.draw_new = False
         else:
             self.draw_new = True
-
+            """
         self.reward_matrix = np.zeros(size)
-
+        self.reward_matrix[self.reward_matrix == 0] = -1"""
         try:
             # print('Updated Road and reward files')
-            if map_name is not 'NONE':
+            if map_name != 'None':
                 file_add = map_name + '/'
             else:
                 file_add = ''
             self.road = pickle.load(open(file_add + "road.p", "rb"))
-            self.reward_matrix = pickle.load(open(file_add + "reward.p", "rb"))
             self.car_start_position, self.car_start_angle = pickle.load(open(file_add + "pos_ang.p", "rb"))
+            self.started = True
+            self.reward_matrix = pickle.load(open(file_add + "reward.p", "rb"))
         except:
+            print(file_add + "pos_ang.p")
             print('Pickle Files Not Found.')
 
         self.car = Car(self.road, size, [200, 500], [0, 1], [0.1, 0],
@@ -65,8 +67,9 @@ class World():
         """
         Returns True if the car has crashed, False otherwise
         """
-
-        if np.all(self.reward_matrix == 0):
+        # print('test', np.all(self.reward_matrix == 0), self.reward_matrix)
+        # print('started:', self.started)
+        if self.started is False:
             return False
         else:
             try:
@@ -96,6 +99,7 @@ class World():
 
         pickle.dump(self.road, open('road.p', 'wb'))
         pickle.dump(combined_save, open('pos_ang.p', 'wb'))
+        self.started = True
         if self.draw_new is True:
                 self.update_reward_matrix()
                 pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
