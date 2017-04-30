@@ -364,8 +364,8 @@ if __name__ == "__main__":
             file_object.close()
         if map_to_use == "None":
             try:
-                os.remove("pos_angle.p")
+                os.remove("pos_ang.p")
                 os.remove("road.p")
                 os.remove("reward.p")
-            except(FileNotFoundError):
-                print("No Custom Files to Delete")
+            except:
+                pass
