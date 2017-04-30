@@ -34,14 +34,14 @@ class World():
         self.car_start_pos = (500, 500)
         self.car_start_angle = 0
 
-        map_selected, autopilot_style = pickle.load(open("map_name.p", "rb"))
-        if autopilot_style == "3":
+        map_selected, self.autopilot_style = pickle.load(open("map_name.p", "rb"))
+        if map_name != "None":
             self.draw_new = False
         else:
             self.draw_new = True
-            """
+
         self.reward_matrix = np.zeros(size)
-        self.reward_matrix[self.reward_matrix == 0] = -1"""
+
         try:
             # print('Updated Road and reward files')
             if map_name != 'None':
@@ -52,6 +52,7 @@ class World():
             self.car_start_position, self.car_start_angle = pickle.load(open(file_add + "pos_ang.p", "rb"))
             self.started = True
             self.reward_matrix = pickle.load(open(file_add + "reward.p", "rb"))
+            self.draw_new = False
         except:
             print(file_add + "pos_ang.p")
             print('Pickle Files Not Found.')
@@ -100,7 +101,9 @@ class World():
         pickle.dump(self.road, open('road.p', 'wb'))
         pickle.dump(combined_save, open('pos_ang.p', 'wb'))
         self.started = True
-        if self.draw_new is True:
+        self.draw_new = False
+        print(self.autopilot_style)
+        if self.autopilot_style != '3':
                 self.update_reward_matrix()
                 pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
 

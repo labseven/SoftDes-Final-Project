@@ -38,6 +38,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
     start = False  # controls appearance of loading screen
+    print(control, 'control')
+    if control:
+        start = True
     score = 0
     # Sets car to the correct starting position based on the map
     reset_car(world, map_name)
@@ -100,35 +103,37 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             # print(world.car.driving_force, world.car.steering, end='\r')
             # Limits the amount the wheels can be turned
 
+            print('world draw new', world.draw_new)
+            if world.draw_new is False:
                 # gets the score of the car, as well as a boolean for catching cheating behavior.
-            hold, position_score = world.car.update_score(world.reward_matrix)
-            if hold == -1:
-                # Car went down in value. Happens on either completion of track or circling behavior
-                reset_car(world)
-                if world.car.time_score < 150:  # If car immediately turns around
-                    return 0
-                elif position_score <= .01 and world.car.speed_total > 10000:  # if car completes the track
-                    # add the speed to incentivize quicker laptimes
-                    score += world.car.average_speed
-                return score
-
-            else:  # car didnt go down in value
-                score = hold
-
-            # constantly checks for circling to reduce downtime in the case of infinite looping
-            if world.car.time_score > 60 and position_score < 1:
-                if np.all(world.reward_matrix == 0):  # catches exception of a track being drawn
-                    pass
-                else:
-                    return 0
-            if world.detect_crash():  # If the car has crashed, reset it
-                reset_car(world, map_name)
-                # print(position_score, world.reward_matrix.max(), world.car.time_score)
-                # catches cheating behavior exploiting the circular nature of any drawn track
-                if position_score > 2 and world.car.time_score < 50:
-                    score = 0
-                if world.car.time_score > .2:
+                hold, position_score = world.car.update_score(world.reward_matrix)
+                if hold == -1:
+                    # Car went down in value. Happens on either completion of track or circling behavior
+                    reset_car(world)
+                    if world.car.time_score < 150:  # If car immediately turns around
+                        return 0
+                    elif position_score <= .01 and world.car.speed_total > 10000:  # if car completes the track
+                        # add the speed to incentivize quicker laptimes
+                        score += world.car.average_speed
                     return score
+
+                else:  # car didnt go down in value
+                    score = hold
+
+                    # constantly checks for circling to reduce downtime in the case of infinite looping
+                if world.car.time_score > 60 and position_score < 1:
+                    if np.all(world.reward_matrix == 0):  # catches exception of a track being drawn
+                        pass
+                    else:
+                        return 0
+                if world.detect_crash():  # If the car has crashed, reset it
+                    reset_car(world, map_name)
+                    # print(position_score, world.reward_matrix.max(), world.car.time_score)
+                    # catches cheating behavior exploiting the circular nature of any drawn track
+                    if position_score > 2 and world.car.time_score < 50:
+                        score = 0
+                    if world.car.time_score > .2:
+                        return score
 
         if world.car.steering > steering_max:
             world.car.steering = steering_max
