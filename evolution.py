@@ -273,13 +273,21 @@ def create_start_window():
     R.insert(END, "Choose how the\n car drives!")  # adds text to the text box
     R.tag_add("center", "1.0", "end")  # implements the centering
 
-    def sel():
+    # Method that gets called on button push
+    def sel(reset=False):
+        # Dictionary for printing track selected name
         d = {1: 'Circle_Track', 2: 'Clover_track', 3: 'Chris_Track', 4: 'Tri-Clover', 5: None}
-
-        print("You selected the option " + str(d[var1.get()]) + ':' + str(var2.get()))
+        try:
+            print("You selected the option " + str(d[var1.get()]) + ':' + str(var2.get()))
+        except:
+            pickle.dump(state, open('map_name.p', 'wb'))
+            root.destroy()
         state[0] = str(d[var1.get()])
         state[1] = str(var2.get())
-        if state[0] is not None and state[1] != '0':
+
+        # if both buttons are pushed, save states to pickle file.
+        # if state[0] is not None and state[1] != '0':
+        if reset:
             pickle.dump(state, open('map_name.p', 'wb'))
             root.destroy()
 
@@ -302,11 +310,15 @@ def create_start_window():
     R1 = Radiobutton(root, text="Existing Autonomous", variable=var2, value=2, command=sel)
     R2 = Radiobutton(root, text="Evolve New Autonomous", variable=var2, value=1, command=sel)
     R3 = Radiobutton(root, text="Drive it Yourself", variable=var2, value=3, command=sel)
+
+    var3 = IntVar()
+    b = Button(root, text="SUBMIT", command=lambda: sel(True))
+
     R.grid(row=0, column=1, sticky=tk.W+tk.E)
     R1.grid(row=1, column=1, sticky=tk.W+tk.E)
     R2.grid(row=2, column=1, sticky=tk.W+tk.E)
     R3.grid(row=3, column=1, sticky=tk.W+tk.E)
-
+    b.grid(row=5, column=1, sticky=tk.W+tk.E)
     # names and centers window
     root.resizable(width=False, height=False)
 

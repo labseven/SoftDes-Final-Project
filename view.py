@@ -140,11 +140,13 @@ class View():
                     self.roundline(world, color, world.track_points[-1], world.track_points[-2],  radius)  # Draw us some lines
 
     def draw_starting_line(self, world, mask):
+        """
+        Draws Start line on existing or newly drawn track.
+        """
         pos = world.car_start_pos
         angle = -world.car_start_angle
         surf = pygame.image.load("assets/StartingLine.png")
 
-        surf_rect = surf.get_rect()
         rot_surf = pygame.transform.rotate(surf, 180-angle*(180/3.1416))
         center_point = rot_surf.get_rect().center
         # new_rect = rot_surf.get_rect()
@@ -195,25 +197,37 @@ class View():
         self.screen.blit(rot_car, new_rect)
 
     def update_draw_vector(self, car):
+        """
+        Updates and draws the vectors that the car sees. Represents vector sum.
+        """
+        # To correct for difference in physical and graphical reference planes
         theta = -car.angle[0]
+
+        # Vector that the Autopilot "sees": i.e. the sum of the vectors
         autopilot_vector = np.matrix([[self.coords[0]], [self.coords[1]]])
+
+        # lateral and longitudinal components of them
         lateral_vector = np.matrix([[self.coords[0]], [0]])
         longitudinal_vector = np.matrix([[0], [self.coords[1]]])
 
+        # Redefines rotation matrix to rotate vector to basis of map
         rotation_matrix = np.matrix([[math.cos(theta), -1 * math.sin(theta)],
                                      [math.sin(theta), math.cos(theta)]])
 
         position_matrix = np.matrix([[car.position[0]], [car.position[1]]])
 
+        # rotates vector to basis of map, and redefines it as tuple
         autopilot_vector = rotation_matrix * autopilot_vector + position_matrix
         autopilot_vector = ((int)(autopilot_vector.item(0)), (int)(autopilot_vector.item(1)))
 
+        # Seperates out the components and draws them as well
         lateral_vector = rotation_matrix * lateral_vector + position_matrix
         lateral_vector = ((int)(lateral_vector.item(0)), (int)(lateral_vector.item(1)))
 
         longitudinal_vector = rotation_matrix * longitudinal_vector + position_matrix
         longitudinal_vector = ((int)(longitudinal_vector.item(0)), (int)(longitudinal_vector.item(1)))
 
+        # Actually Draws the lines
         pygame.draw.line(self.screen, (0, 0, 255), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), autopilot_vector)
         pygame.draw.line(self.screen, (255, 255, 0), (car.position[0]+car.sprite_w/2, car.position[1]+car.sprite_h/2), lateral_vector)
         pygame.draw.line(self.screen, (255, 0, 255), autopilot_vector, lateral_vector)
