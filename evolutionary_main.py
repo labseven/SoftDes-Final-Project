@@ -38,14 +38,12 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
     keys_pressed = [0, 0, 0, 0]  # The pressed status of the keys
     start = False  # controls appearance of loading screen
-    print(control, 'control')
     if control:
         start = True
     score = 0
     # Sets car to the correct starting position based on the map
     reset_car(world, map_name)
     view.road_mask = view.get_road_surface(view.world)
-    print('draw', draw)
     if draw:
         while start:
             events = get_events()
@@ -103,7 +101,6 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             # print(world.car.driving_force, world.car.steering, end='\r')
             # Limits the amount the wheels can be turned
 
-            print('world draw new', world.draw_new)
             if world.draw_new is False:
                 # gets the score of the car, as well as a boolean for catching cheating behavior.
                 hold, position_score = world.car.update_score(world.reward_matrix)
@@ -161,8 +158,6 @@ def reset_car(world, map_name="NONE"):
         # Moves the car to the correct position as well as the right angle.
         world.reset_car()
     except(FileNotFoundError):
-        print(file_add + "pos_ang.p")
-        print('couldnt find files')
         pass
 
 

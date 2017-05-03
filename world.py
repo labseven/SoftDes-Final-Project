@@ -54,8 +54,9 @@ class World():
             self.reward_matrix = pickle.load(open(file_add + "reward.p", "rb"))
             self.draw_new = False
         except:
-            print(file_add + "pos_ang.p")
-            print('Pickle Files Not Found.')
+            # print(file_add + "pos_ang.p")
+            # print('Pickle Files Not Found.')
+            pass
 
         self.car = Car(self.road, size, [200, 500], [0, 1], [0.1, 0],
                        car_color=(randint(0, 255),
@@ -102,7 +103,7 @@ class World():
         pickle.dump(combined_save, open('pos_ang.p', 'wb'))
         self.started = True
         self.draw_new = False
-        print(self.autopilot_style)
+        # print(self.autopilot_style)
         if self.autopilot_style != '3':
                 self.update_reward_matrix()
                 pickle.dump(self.reward_matrix, open('reward.p', 'wb'))
