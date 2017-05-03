@@ -180,7 +180,7 @@ def get_input():
     keys = pygame.key.get_pressed()
     keys_down = [idx for idx, val in enumerate(keys) if val == 1]
     # The event values representing the keys pressed
-    event_keys = (pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_a)
+    event_keys = (pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT)
     # Convert the list of pressed keys to a list of each relevant key's state
     key_states = [int(key in keys_down) for key in event_keys]
     return key_states
