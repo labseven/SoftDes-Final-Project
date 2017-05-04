@@ -280,8 +280,7 @@ def create_start_window():
         try:
             print("You selected the option " + str(d[var1.get()]) + ':' + str(var2.get()))
         except:
-            pickle.dump(state, open('map_name.p', 'wb'))
-            root.destroy()
+            pass
         state[0] = str(d[var1.get()])
         state[1] = str(var2.get())
 
