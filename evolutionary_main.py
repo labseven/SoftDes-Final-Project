@@ -14,7 +14,7 @@ import pickle
 import numpy as np
 
 # maximum braking and acceleration forces.
-FORCE = -500
+FORCE = -800
 BRAKING = -500
 steering_max = pi/4-.1
 INCREMENT = pi/4
@@ -109,7 +109,8 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             # Car Sounds
             if world.car.visible:
                 velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2
-                volume = (velocity - 200) / 500 # 200 is slow, 700 is fast
+                print(velocity)
+                volume = (velocity - 100) / 200 # 100 is slow, 400 is fast
                 if volume > 1:
                     volume = 1
                 if volume < 0:
