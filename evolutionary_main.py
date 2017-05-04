@@ -14,7 +14,7 @@ import pickle
 import numpy as np
 
 # maximum braking and acceleration forces.
-FORCE = -1000
+FORCE = -500
 BRAKING = -500
 steering_max = pi/4-.1
 INCREMENT = pi/4
@@ -30,7 +30,7 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
         map_name    string representation of the map to be used. See documentation for valid names.
     """
     # Initializes world and window
-    lives = 4
+    lives = 11
 
     size = (1000, 1000)
     world = World(size, map_name)
