@@ -20,6 +20,18 @@ steering_max = pi/4-.1
 INCREMENT = pi/4
 
 
+# Initialize sounds
+low_sound = pygame.mixer.Sound('assets/car_low.ogg')
+low_sound.set_volume(0)
+low_sound.play(loops=-1, fade_ms=100)
+
+high_sound = pygame.mixer.Sound('assets/car_high.ogg')
+high_sound.set_volume(0)
+high_sound.play(loops=-1, fade_ms=100)
+
+crash_sound = pygame.mixer.Sound('assets/crash.ogg')
+
+
 def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], map_name="None"):
     """
     Parent function of everything the actual simulation does.
@@ -44,7 +56,16 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     # Sets car to the correct starting position based on the map
     reset_car(world, map_name)
     view.road_mask = view.get_road_surface(view.world)
+
+
+
+
+
     if draw:
+        # Play intro music
+        pygame.mixer.music.load('assets/corn_racer.mp3')
+        pygame.mixer.music.play(loops=-1)
+
         while start:
             events = get_events()
 
@@ -57,6 +78,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 start = False
 
             view.draw_start(size)
+
+        # Stop the intro music
+        pygame.mixer.music.stop()
 
     while True:
 
@@ -75,9 +99,27 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             world.car.steering = (keys_pressed[2]-keys_pressed[3]) * INCREMENT
             if world.detect_crash():  # If the car has crashed, reset it
                 reset_car(world, map_name)
-                lives -= 1
+
+                crash_sound.play()
+
                 if lives <= 0:
                     return "Run Out Of Lives!"
+                lives -= 1
+
+            # Car Sounds
+            if world.car.visible:
+                velocity = world.car.velocity[0]**2 + world.car.velocity[1]**2
+                volume = (velocity - 200) / 500 # 200 is slow, 700 is fast
+                if volume > 1:
+                    volume = 1
+                if volume < 0:
+                    volume = 0
+
+                # Crossfade volume from low to high as velocity increases
+                low_sound.set_volume(1 - (volume/2))
+                high_sound.set_volume(volume)
+
+
         else:
             # Of the form (turn, accelerator)
             # Returns the x and y components respectively of the final summed vector.
@@ -88,6 +130,8 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                 view.coords = (d_steer, d_gas)
                 view.draw_scene(world, events)
                 view.press_button(events)
+
+
                 # Experimental Draving of Autopilot Vector
             # Limits the gas applied to be within the constraints of the system
             if d_gas > 1:
@@ -125,6 +169,9 @@ def main(draw, control, autopilot=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
                         return 0
                 if world.detect_crash():  # If the car has crashed, reset it
                     reset_car(world, map_name)
+
+
+
                     # print(position_score, world.reward_matrix.max(), world.car.time_score)
                     # catches cheating behavior exploiting the circular nature of any drawn track
                     if position_score > 2 and world.car.time_score < 50:
