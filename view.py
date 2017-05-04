@@ -267,9 +267,12 @@ class View():
             if event.type == pygame.QUIT:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if self.Button1.pressed(pygame.mouse.get_pos()):
-                    self.world.road = np.zeros(self.size)  # when pressed, contents of road matrix is cleared, aka set to 0
-                    self.road_mask = self.get_road_surface(self.world)  # re-renders the road picture on the screen so it is clear of road
+                try:
+                    if self.Button1.pressed(pygame.mouse.get_pos()):
+                        self.world.road = np.zeros(self.size)  # when pressed, contents of road matrix is cleared, aka set to 0
+                        self.road_mask = self.get_road_surface(self.world)  # re-renders the road picture on the screen so it is clear of road
+                except(AttributeError):
+                    pass
 
 # http://stackoverflow.com/questions/597369/how-to-create-ms-paint-clone-with-python-and-pygame
 

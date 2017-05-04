@@ -14,7 +14,7 @@ import pickle
 import numpy as np
 
 # maximum braking and acceleration forces.
-FORCE = -1000
+FORCE = -500
 BRAKING = -500
 steering_max = pi/4-.1
 INCREMENT = pi/4
